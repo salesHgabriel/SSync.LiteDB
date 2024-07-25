@@ -1,17 +1,23 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Sync;
+using System.Reflection;
 using System.Text.Json;
 
 
 try
 {
     var colName = nameof(User); 
-    using var db = new LiteDatabase("");
+    var colNameEstoque = nameof(Estoque);
+
+    string dirApp = Directory.GetParent(Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).ToString()).ToString()).ToString(); // Only test, NOT PRD !!
+
+    var path = dirApp +  "\\Examples\\MyData.db";
+    using var db = new LiteDatabase(path);
 
     var sync = new Synchronize(db);
 
-    //var col2 = db.GetCollection<User>(colName);
+    var colUser = db.GetCollection<User>(colName);
 
 
     //var user = new User(Guid.NewGuid())
@@ -22,13 +28,10 @@ try
 
 
     //user.CreateAt();
-    //col2.Insert(user);
+    //colUser.Insert(user);
 
 
-    //col2.Insert(user2);
-
-
-    //var user = col2.FindOne(u => u.Id == Guid.Parse("2a09e8f4-52d7-45de-a4f3-5f494fd036b0"));
+    //var user = colUser.FindOne(u => u.Id == Guid.Parse("8ade4fa5-3077-411d-a6a9-782c0bde278e"));
 
     //user.Name = "Gabriel atualizado 3";
 
@@ -36,10 +39,29 @@ try
 
     //user.UpdateAt();
 
-    //col2.Update(user);
-
-
     //user.DeleteAt();
+
+    //colUser.Update(user);
+
+
+
+
+
+    //var colEstoque = db.GetCollection<Estoque>(colNameEstoque);
+
+
+    //var estoque = new Estoque(Guid.NewGuid())
+    //{
+    //    Valor = new Random().Next(50)
+    //};
+
+
+
+    //estoque.CreateAt();
+    //colEstoque.Insert(estoque);
+
+
+
 
 
 
@@ -49,15 +71,16 @@ try
     //Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(pullChangesUser, new JsonSerializerOptions() { WriteIndented = true }));
 
 
-    var pullChangesBuilder = new SyncPullBuilder();
 
     var x = 0;
 
     var now = DateTime.UtcNow;
 
+    var pullChangesBuilder = new SyncPullBuilder();
+
     pullChangesBuilder
         .AddSync(() => sync.PullChangesResult<User>(x, colName, now))
-        .AddSync(() => sync.PullChangesResult<Estoque>(x, nameof(Estoque), now))
+        .AddSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
         .Build();
 
     var databaseLocal  = pullChangesBuilder.DatabaseChanges;
