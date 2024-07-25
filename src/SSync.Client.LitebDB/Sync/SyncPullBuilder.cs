@@ -7,7 +7,7 @@ namespace SSync.Client.LitebDB.Sync
         private readonly List<Func<object>> _actions = new List<Func<object>>();
         public List<object> DatabaseChanges { get; } = new List<object>();
 
-        public SyncPullBuilder AddSync<T>(Func<SchemaResult<T>> action) where T : BaseSync
+        public SyncPullBuilder AddPullSync<T>(Func<SchemaResult<T>> action) where T : BaseSync
         {
             _actions.Add(() => action());
             return this;

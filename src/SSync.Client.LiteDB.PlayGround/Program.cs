@@ -80,8 +80,8 @@ try
     var pullChangesBuilder = new SyncPullBuilder();
 
     pullChangesBuilder
-        .AddSync(() => sync.PullChangesResult<User>(x, colName, now))
-        .AddSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
+        .AddPullSync(() => sync.PullChangesResult<User>(x, colName, now))
+        .AddPullSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
         .Build();
 
     var databaseLocal  = pullChangesBuilder.DatabaseChanges;
