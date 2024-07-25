@@ -52,9 +52,12 @@ try
     var pullChangesBuilder = new SyncPullBuilder();
 
     var x = 0;
+
+    var now = DateTime.UtcNow;
+
     pullChangesBuilder
-        .AddSync(() => sync.PullChangesResult<User>(0/*DateTime.UtcNow.Ticks*/, colName))
-        .AddSync(() => sync.PullChangesResult<Estoque>(x, nameof(Estoque)))
+        .AddSync(() => sync.PullChangesResult<User>(x, colName, now))
+        .AddSync(() => sync.PullChangesResult<Estoque>(x, nameof(Estoque), now))
         .Build();
 
     var databaseLocal  = pullChangesBuilder.DatabaseChanges;

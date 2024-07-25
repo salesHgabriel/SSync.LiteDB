@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Custom
+
+/src/SSync.Client.LiteDB.PlayGround/Examples/*

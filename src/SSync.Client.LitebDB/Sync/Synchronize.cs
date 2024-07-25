@@ -1,6 +1,5 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions;
-using System.Text.Json;
 
 namespace SSync.Client.LitebDB.Sync
 {
@@ -15,16 +14,15 @@ namespace SSync.Client.LitebDB.Sync
         /// <summary>
         /// if lastPulledAt is equal 0, load all rows for default
         /// if documentName is null, get name of class  for default
-        /// if Datetime is null, get ticks of utc
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="lastPulledAt"></param>
         /// <param name="documentName"></param>
         /// <returns></returns>
-        public SchemaResult<T> PullChangesResult<T>(long lastPulledAt, string documentName, DateTime? now = null) where T : BaseSync
+        public SchemaResult<T> PullChangesResult<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
         {
             documentName ??= typeof(T).Name;
-            var timestamp = now is null ? DateTime.UtcNow.Ticks : now.Value.Ticks;
+            var timestamp =  now.Ticks;
             var doc = _db.GetCollection<T>(documentName);
 
             var createdQuery = doc.Query().Where(d => d.Status == StatusSync.CREATED);
