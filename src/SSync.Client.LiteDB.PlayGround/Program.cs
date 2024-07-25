@@ -13,6 +13,7 @@ try
     string dirApp = Directory.GetParent(Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).ToString()).ToString()).ToString(); // Only test, NOT PRD !!
 
     var path = dirApp +  "\\Examples\\MyData.db";
+    
     using var db = new LiteDatabase(path);
 
     var sync = new Synchronize(db);
