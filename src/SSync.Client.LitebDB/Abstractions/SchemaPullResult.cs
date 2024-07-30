@@ -1,12 +1,12 @@
 ﻿namespace SSync.Client.LitebDB.Abstractions
 {
-    public class SchemaResult<T> where T : BaseSync
+    public class SchemaPullResult<T> where T : BaseSync
     {
-        public SchemaResult()
+        public SchemaPullResult()
         {
 
         }
-        public SchemaResult(string? documentName, long timestamp, Change changesModel)
+        public SchemaPullResult(string? documentName, long timestamp, Change changesModel)
         {
             Document = documentName;
             Timestamp = timestamp;

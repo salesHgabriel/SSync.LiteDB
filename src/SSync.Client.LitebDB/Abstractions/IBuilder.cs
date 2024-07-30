@@ -1,6 +1,6 @@
 ﻿namespace SSync.Client.LitebDB.Abstractions
 {
-    public interface ISyncPullBuilder
+    public interface IBuilder
     {
         void Build();
     }

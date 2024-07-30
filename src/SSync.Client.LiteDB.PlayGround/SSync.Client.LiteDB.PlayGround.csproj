@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Examples\" />
+    <ProjectReference Include="..\SSync.Client.LitebDB\SSync.Client.LitebDB.csproj" />
   </ItemGroup>
 
 </Project>
