@@ -20,19 +20,46 @@ try
         SaveLogOnFile = true
     });
 
-    //var colUser = db.GetCollection<User>(colName);
 
-    //var user = new User(Guid.NewGuid())
-    //{
-    //    Name = $"Gabriel Sales {DateTime.UtcNow.Ticks}"
-    //};
+    var colUser = db.GetCollection<User>(colName);
+
+
+
+    //var user = new User(Guid.NewGuid(), "Oliveira");
 
     //user.CreateAt();
     //colUser.Insert(user);
 
-    //var user = colUser.FindOne(u => u.Id == Guid.Parse("8ade4fa5-3077-411d-a6a9-782c0bde278e"));
+    //multipe create
 
-    //user.Name = "Gabriel atualizado 3";
+    //for (int i = 0; i < 100; i++)
+    //{
+    //    var user = new User(Guid.NewGuid())
+    //    {
+    //        Name = $"Cotoso {DateTime.UtcNow.Ticks}"
+    //    };
+
+    //    user.CreateAt();
+    //    colUser.Insert(user);
+    //}
+
+
+    var usersUpdateTeste = colUser.Query().Where(u => u.Name.StartsWith("Gabriel Sales")).Limit(10).ToList();
+
+    foreach (var us in usersUpdateTeste)
+    {
+
+        us.Name = "Cotoso update";
+        us.UpdateAt();
+
+        colUser.Update(us);
+    }
+
+
+
+    //var user = colUser.FindOne(u => u.Id == Guid.Parse("02e78c9a-0521-4503-a605-93e2caab183f"));
+
+    //user.Name = "Cotoso update 3";
 
     //user.UpdateAt();
 
@@ -42,13 +69,18 @@ try
 
     //var colEstoque = db.GetCollection<Estoque>(colNameEstoque);
 
-    //var estoque = new Estoque(Guid.NewGuid())
+    //for (int i = 0; i < 100; i++)
     //{
-    //    Valor = new Random().Next(50)
-    //};
+    //    var estoque = new Estoque(Guid.NewGuid())
+    //    {
+    //        Valor = new Random().Next(50)
+    //    };
 
-    //estoque.CreateAt();
-    //colEstoque.Insert(estoque);
+    //    estoque.CreateAt();
+    //    colEstoque.Insert(estoque);
+    //}
+
+
 
     //pull local
 
@@ -67,9 +99,10 @@ try
 
     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
 
-    //push because it is being used by another process.)'
 
-   // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
+
+    //simute server changes
+    // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
     //var pushBuilder = new SyncPushBuilder(responseServer);
 
@@ -89,11 +122,16 @@ Console.ReadKey();
 
 public class User : BaseSync
 {
+    public User()
+    {
+        
+    }
     public User(Guid id) : base(id)
     {
+     
     }
 
-    public string Name { get; set; } = string.Empty;
+    public string Name { get;  set; } = string.Empty;
 }
 
 public class Estoque : BaseSync
