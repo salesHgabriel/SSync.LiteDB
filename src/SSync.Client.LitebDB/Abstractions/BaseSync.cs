@@ -4,6 +4,10 @@ namespace SSync.Client.LitebDB.Abstractions
 {
     public abstract class BaseSync
     {
+        protected BaseSync()
+        {
+            
+        }
         protected BaseSync(Guid id) : base() => Id = id;
 
         /// <summary>
@@ -38,11 +42,14 @@ namespace SSync.Client.LitebDB.Abstractions
         }
 
         [BsonId]
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
-        public long CreatedAt { get; private set; }
-        public long UpdatedAt { get; private set; }
-        public long? DeletedAt { get; private set; }
-        public StatusSync Status { get; private set; }
+        public long CreatedAt { get; set; }
+
+        public long UpdatedAt { get; set; }
+
+        public long? DeletedAt { get; set; }
+
+        public StatusSync Status { get; set; }
     }
 }

@@ -75,6 +75,12 @@ namespace SSync.Client.LitebDB.Sync
             return new SchemaPullResult<T>();
         }
 
+        /// <summary>
+        /// Update local database
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="schemaPush"></param>
+        /// <returns></returns>
         public SchemaPush<T> PushChangesResultAsync<T>(SchemaPush<T> schemaPush) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(schemaPush);
