@@ -132,8 +132,6 @@ namespace SSync.Client.LitebDB.Sync
         {
             if (_options?.Mode == Mode.DEBUG)
             {
-                var msg = new StringBuilder();
-
                 if (_options.SaveLogOnFile)
                 {
                     using TextWriter w = File.AppendText($"{_options?.PathFile}\\{title}");
@@ -145,6 +143,13 @@ namespace SSync.Client.LitebDB.Sync
                 }
                 else
                 {
+                    var msg = new StringBuilder();
+                    msg.Append("\r\nLog Entry :");
+                    msg.AppendLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    msg.AppendLine("  :");
+                    msg.AppendLine($"  :{logMessage}");
+                    msg.AppendLine("########################################################################");
+
                     Console.ForegroundColor = consoleColor;
                     Console.WriteLine(msg.ToString());
                 }
