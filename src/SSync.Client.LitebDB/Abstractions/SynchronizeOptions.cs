@@ -8,13 +8,13 @@
         public Mode Mode { get; set; } = Mode.RELEASE;
 
         /// <summary>
-        /// Path in save database
+        /// Path in save file text to debug log
         /// </summary>
-        public string ConnectionString { get; set; } = string.Empty;
+        public string PathFile { get; set; } = string.Empty;
 
         /// <summary>
-        /// This save file on path ConnectionString in .txt
-        /// If not set true show output terminal
+        /// This save file on path in .txt
+        /// If not set true will show output on terminal
         /// </summary>
         public bool SaveLogOnFile { get; set; } = false;
     }

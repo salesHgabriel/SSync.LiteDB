@@ -13,7 +13,12 @@ try
 
     using var db = new LiteDatabase(path);
 
-    var sync = new Synchronize(db);
+    var sync = new Synchronize(db, new SynchronizeOptions()
+    {
+        PathFile = dirApp,
+        Mode = Mode.DEBUG,
+        SaveLogOnFile = true
+    });
 
     //var colUser = db.GetCollection<User>(colName);
 
@@ -47,36 +52,32 @@ try
 
     //pull local
 
-    //var pullChangesUser = sync.PullChangesResult<User>(0/*DateTime.UtcNow.Ticks*/, colName);
-    //var pullChangesEstoque = sync.PullChangesResult<Estoque>(0/*DateTime.UtcNow.Ticks*/, nameof(Estoque));
+    var x = 0;
 
-    //Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(pullChangesUser, new JsonSerializerOptions() { WriteIndented = true }));
+    var now = DateTime.UtcNow;
 
-    //var x = 0;
+    var pullChangesBuilder = new SyncPullBuilder();
 
-    //var now = DateTime.UtcNow;
+    pullChangesBuilder
+        .AddPullSync(() => sync.PullChangesResultAsync<User>(x, colName, now))
+        .AddPullSync(() => sync.PullChangesResultAsync<Estoque>(x, colNameEstoque, now))
+        .Build();
 
-    //var pullChangesBuilder = new SyncPullBuilder();
+    var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
 
-    //pullChangesBuilder
-    //    .AddPullSync(() => sync.PullChangesResult<User>(x, colName, now))
-    //    .AddPullSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
-    //    .Build();
+    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
 
-    //var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
+    //push because it is being used by another process.)'
 
-    //Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new JsonSerializerOptions() { WriteIndented = true }));
-
-    //push
-    string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
+   // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
     //var pushBuilder = new SyncPushBuilder(responseServer);
 
     //pushBuilder
     //    .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
-    //    .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque);
+    //    .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
+    //    .Build();
 
-    //pushBuilder.Build();
 }
 catch (Exception ex)
 {

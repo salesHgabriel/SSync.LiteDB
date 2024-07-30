@@ -25,11 +25,11 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="lastPulledAt"></param>
         /// <param name="documentName"></param>
         /// <returns></returns>
-        public async Task<SchemaPullResult<T>> PullChangesResultAsync<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
+        public SchemaPullResult<T> PullChangesResultAsync<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
         {
             try
             {
-                await LogAsync("Start fetch local changes");
+                Log("Start fetch local changes");
 
                 documentName ??= typeof(T).Name;
                 var timestamp = now.Ticks;
@@ -47,12 +47,12 @@ namespace SSync.Client.LitebDB.Sync
                         .Select(d => d.Id)
                         .ToEnumerable();
 
-                    await LogAsync("Succefull fetch local all changes");
+                    Log("Succefull fetch local all changes");
 
                     return new SchemaPullResult<T>(documentName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
                 }
 
-                await LogAsync($"Succefull fetch local changes from last pulled At {lastPulledAt}");
+                Log($"Succefull fetch local changes from last pulled At {lastPulledAt}");
 
                 return new SchemaPullResult<T>(
                     documentName,
@@ -66,16 +66,16 @@ namespace SSync.Client.LitebDB.Sync
             }
             catch (PullChangesException ex)
             {
-                await LogAsync($"Ops Erro fetch changes", consoleColor: ConsoleColor.Red);
-                await LogAsync(ex);
-                await LogAsync(ex.Message);
-                await LogAsync(ex.InnerException?.Message ?? string.Empty);
+                Log($"Ops Erro fetch changes", consoleColor: ConsoleColor.Red);
+                Log(ex);
+                Log(ex.Message);
+                Log(ex.InnerException?.Message ?? string.Empty);
             }
 
             return new SchemaPullResult<T>();
         }
 
-        public async Task<SchemaPush<T>> PushChangesResultAsync<T>(SchemaPush<T> schemaPush) where T : BaseSync
+        public SchemaPush<T> PushChangesResultAsync<T>(SchemaPush<T> schemaPush) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(schemaPush);
 
@@ -83,7 +83,7 @@ namespace SSync.Client.LitebDB.Sync
 
             try
             {
-                await LogAsync($"Start push changes");
+                Log($"Start push changes");
 
                 var col = _db.GetCollection<T>(schemaPush.Document);
 
@@ -93,11 +93,11 @@ namespace SSync.Client.LitebDB.Sync
 
                 _db.BeginTrans();
 
-                await LogAsync($"Start transaction database");
+                Log($"Start transaction database");
 
                 var totalInsertId = col.InsertBulk(idsNotExistsLocalDatabase);
 
-                await LogAsync($"Total {totalInsertId} inserted");
+                Log($"Total {totalInsertId} inserted");
 
                 foreach (var item in schemaPush.Changes.Updated)
                 {
@@ -107,12 +107,12 @@ namespace SSync.Client.LitebDB.Sync
                 if (schemaPush.HasDeleted)
                 {
                     var totalDeleted = col.DeleteMany(t => schemaPush.Changes.Deleted.Contains(t.Id));
-                    await LogAsync($"Total {totalDeleted} deleteds");
+                    Log($"Total {totalDeleted} deleteds");
                 }
 
                 _db.Commit();
 
-                await LogAsync($"Commit transaction database");
+                Log($"Commit transaction database");
 
                 return schemaPush;
             }
@@ -120,29 +120,28 @@ namespace SSync.Client.LitebDB.Sync
             {
                 _db.Rollback();
 
-                await LogAsync($"Ops Erro push changes", consoleColor: ConsoleColor.Red);
-                await LogAsync(ex);
-                await LogAsync(ex.Message);
-                await LogAsync(ex.InnerException?.Message ?? string.Empty);
+                Log($"Ops Erro push changes", consoleColor: ConsoleColor.Red);
+                Log(ex);
+                Log(ex.Message);
+                Log(ex.InnerException?.Message ?? string.Empty);
             }
             return schemaPush;
         }
 
-        public async Task LogAsync(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
+        public void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
         {
             if (_options?.Mode == Mode.DEBUG)
             {
                 var msg = new StringBuilder();
 
-                msg.AppendLine("\r\nLog Entry :)");
-                msg.AppendLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                msg.AppendLine("  :");
-                msg.AppendLine($"  :{logMessage}");
-                msg.AppendLine("########################################################################");
-
                 if (_options.SaveLogOnFile)
                 {
-                    await File.AppendAllTextAsync($"{_options?.ConnectionString}\\{title}", msg.ToString());
+                    using TextWriter w = File.AppendText($"{_options?.PathFile}\\{title}");
+                    w.Write("\r\nLog Entry :");
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    w.WriteLine("  :");
+                    w.WriteLine($"  :{logMessage}");
+                    w.WriteLine("########################################################################");
                 }
                 else
                 {
@@ -156,7 +155,7 @@ namespace SSync.Client.LitebDB.Sync
         {
             if (_options?.Mode == Mode.DEBUG && _options.SaveLogOnFile)
             {
-                using StreamReader r = File.OpenText($"{_options?.ConnectionString}\\{title}");
+                using StreamReader r = File.OpenText($"{_options?.PathFile}\\{title}");
                 string? line;
 
                 Console.ForegroundColor = consoleColor;
