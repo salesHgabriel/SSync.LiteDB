@@ -26,54 +26,62 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="lastPulledAt"></param>
         /// <param name="documentName"></param>
         /// <returns></returns>
-        public SchemaPullResult<T> PullChangesResultAsync<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
+        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
         {
-            try
+            if (_db is null)
             {
-                Log("Start fetch local changes");
-
-                documentName ??= typeof(T).Name;
-                var timestamp = now.Ticks;
-                var doc = _db.GetCollection<T>(documentName);
-
-                var createdQuery = doc.Query().Where(d => d.Status == StatusSync.CREATED);
-                var updatedQuery = doc.Query().Where(d => d.Status == StatusSync.UPDATED);
-                var deletedQuery = doc.Query().Where(d => d.Status == StatusSync.DELETED);
-
-                if (lastPulledAt == 0)
-                {
-                    var createds = createdQuery.ToEnumerable();
-                    var updateds = updatedQuery.ToEnumerable();
-                    var deleteds = deletedQuery
-                        .Select(d => d.Id)
-                        .ToEnumerable();
-
-                    Log("Succefull fetch local all changes");
-
-                    return new SchemaPullResult<T>(documentName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
-                }
-
-                Log($"Succefull fetch local changes from last pulled At {lastPulledAt}");
-
-                return new SchemaPullResult<T>(
-                    documentName,
-                    timestamp,
-                    new SchemaPullResult<T>.Change(
-                        createdQuery.Where(d => d.CreatedAt > lastPulledAt).ToEnumerable(),
-                        updatedQuery.Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.UpdatedAt > lastPulledAt).ToEnumerable(),
-                        deletedQuery.Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.DeletedAt > lastPulledAt).Select(d => d.Id).ToEnumerable()
-                        )
-                    );
-            }
-            catch (PullChangesException ex)
-            {
-                Log($"Ops Erro fetch changes", consoleColor: ConsoleColor.Red);
-                Log(ex);
-                Log(ex.Message);
-                Log(ex.InnerException?.Message ?? string.Empty);
+                Log($"Database not initialized", consoleColor: ConsoleColor.Red);
+                throw new PullChangesException("Database not initialized");
             }
 
-            return new SchemaPullResult<T>();
+            if (lastPulledAt < 0)
+            {
+                Log($"Range less of zero", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("Range less of zero");
+            }
+
+            Log("Start fetch local changes");
+
+            documentName ??= typeof(T).Name;
+            var timestamp = now.Ticks;
+            var doc = _db.GetCollection<T>(documentName);
+
+            if (doc is null)
+            {
+                Log($"Collection not found", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("Collection not found");
+            }
+
+            var createdQuery = doc.Query().Where(d => d.Status == StatusSync.CREATED);
+            var updatedQuery = doc.Query().Where(d => d.Status == StatusSync.UPDATED);
+            var deletedQuery = doc.Query().Where(d => d.Status == StatusSync.DELETED);
+
+            if (lastPulledAt == 0)
+            {
+                var createds = createdQuery.ToEnumerable();
+                var updateds = updatedQuery.ToEnumerable();
+                var deleteds = deletedQuery
+                    .Select(d => d.Id)
+                    .ToEnumerable();
+
+                Log("Succefully fetch local all changes");
+
+                return new SchemaPullResult<T>(documentName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
+            }
+
+            Log($"Succefully fetch local changes from last pulled At {lastPulledAt}");
+
+            return new SchemaPullResult<T>(
+                documentName,
+                timestamp,
+                new SchemaPullResult<T>.Change(
+                    createdQuery.Where(d => d.CreatedAt > lastPulledAt).ToEnumerable(),
+                    updatedQuery.Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.UpdatedAt > lastPulledAt).ToEnumerable(),
+                    deletedQuery.Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.DeletedAt > lastPulledAt).Select(d => d.Id).ToEnumerable()
+                    )
+                );
         }
 
         /// <summary>
@@ -82,56 +90,55 @@ namespace SSync.Client.LitebDB.Sync
         /// <typeparam name="T"></typeparam>
         /// <param name="schemaPush"></param>
         /// <returns></returns>
-        public SchemaPush<T> PushChangesResultAsync<T>(SchemaPush<T> schemaPush) where T : BaseSync
+        public SchemaPush<T> PushChangesResult<T>(SchemaPush<T> schemaPush) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(schemaPush);
 
+            if (_db is null)
+            {
+                throw new PushChangeException("Database not initialized");
+            }
+
             if (!schemaPush.HasChanges) return schemaPush;
 
-            try
+            Log($"Start push changes");
+
+            var col = _db.GetCollection<T>(schemaPush.Document);
+
+            if (col is null)
             {
-                Log($"Start push changes");
+                Log($"Collection not found", consoleColor: ConsoleColor.Red);
 
-                var col = _db.GetCollection<T>(schemaPush.Document);
-
-                var idsRemotedCreateds = schemaPush.Changes.Created.Select(s => s.Id);
-
-                var idsNotExistsLocalDatabase = schemaPush.Changes.Created.Where(s => !idsRemotedCreateds.Contains(s.Id));
-
-                _db.BeginTrans();
-
-                Log($"Start transaction database");
-
-                var totalInsertId = col.InsertBulk(idsNotExistsLocalDatabase);
-
-                Log($"Total {totalInsertId} inserted");
-
-                foreach (var item in schemaPush.Changes.Updated)
-                {
-                    col.Update(item);
-                }
-
-                if (schemaPush.HasDeleted)
-                {
-                    var totalDeleted = col.DeleteMany(t => schemaPush.Changes.Deleted.Contains(t.Id));
-                    Log($"Total {totalDeleted} deleteds");
-                }
-
-                _db.Commit();
-
-                Log($"Commit transaction database");
-
-                return schemaPush;
+                throw new PushChangeException("Collection not found");
             }
-            catch (PushChangeException ex)
+
+            var idsRemotedCreateds = schemaPush.Changes.Created.Select(s => s.Id);
+
+            var idsNotExistsLocalDatabase = schemaPush.Changes.Created.Where(s => !idsRemotedCreateds.Contains(s.Id));
+
+            _db.BeginTrans();
+
+            Log($"Start transaction database");
+
+            var totalInsertId = col.InsertBulk(idsNotExistsLocalDatabase);
+
+            Log($"Total {totalInsertId} inserted");
+
+            foreach (var item in schemaPush.Changes.Updated)
             {
-                _db.Rollback();
-
-                Log($"Ops Erro push changes", consoleColor: ConsoleColor.Red);
-                Log(ex);
-                Log(ex.Message);
-                Log(ex.InnerException?.Message ?? string.Empty);
+                col.Update(item);
             }
+
+            if (schemaPush.HasDeleted)
+            {
+                var totalDeleted = col.DeleteMany(t => schemaPush.Changes.Deleted.Contains(t.Id));
+                Log($"Total {totalDeleted} deleteds");
+            }
+
+            _db.Commit();
+
+            Log($"Commit transaction database");
+
             return schemaPush;
         }
 

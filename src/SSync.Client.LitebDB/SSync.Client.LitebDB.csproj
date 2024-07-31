@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-  <ItemGroup>
-    <PackageReference Include="LiteDB" Version="5.0.21" />
-  </ItemGroup>
+		<Authors>Gabriel Sales</Authors>
+		<Copyright>MIT</Copyright>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="LiteDB" Version="5.0.21" />
+	</ItemGroup>
 
 </Project>

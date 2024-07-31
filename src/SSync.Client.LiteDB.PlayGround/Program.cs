@@ -92,8 +92,8 @@ try
     var pullChangesBuilder = new SyncPullBuilder();
 
     pullChangesBuilder
-        .AddPullSync(() => sync.PullChangesResultAsync<User>(x, colName, now))
-        .AddPullSync(() => sync.PullChangesResultAsync<Estoque>(x, colNameEstoque, now))
+        .AddPullSync(() => sync.PullChangesResult<User>(x, colName, now))
+        .AddPullSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
         .Build();
 
     var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
