@@ -18,18 +18,14 @@ try
     {
         PathFile = dirApp,
         Mode = Mode.DEBUG,
-        SaveLogOnFile = true
+        SaveLogOnFile = false
     });
-
 
     var colUser = db.GetCollection<User>(colName);
 
+    var user = new User(Guid.NewGuid()) { Name = "Oliveira" };
 
-
-    //var user = new User(Guid.NewGuid(), "Oliveira");
-
-    //user.CreateAt();
-    //colUser.Insert(user);
+     sync.InsertSync(user, colUser);
 
     //multipe create
 
@@ -44,19 +40,15 @@ try
     //    colUser.Insert(user);
     //}
 
+    //var usersUpdateTeste = colUser.Query().Where(u => u.Name.StartsWith("Gabriel Sales")).Limit(10).ToList();
 
-    var usersUpdateTeste = colUser.Query().Where(u => u.Name.StartsWith("Gabriel Sales")).Limit(10).ToList();
+    //foreach (var us in usersUpdateTeste)
+    //{
+    //    us.Name = "Cotoso update";
+    //    us.UpdateAt();
 
-    foreach (var us in usersUpdateTeste)
-    {
-
-        us.Name = "Cotoso update";
-        us.UpdateAt();
-
-        colUser.Update(us);
-    }
-
-
+    //    colUser.Update(us);
+    //}
 
     //var user = colUser.FindOne(u => u.Id == Guid.Parse("02e78c9a-0521-4503-a605-93e2caab183f"));
 
@@ -81,8 +73,6 @@ try
     //    colEstoque.Insert(estoque);
     //}
 
-
-
     //pull local
 
     var x = 0;
@@ -100,8 +90,6 @@ try
 
     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
 
-
-
     //simute server changes
     // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
@@ -111,7 +99,6 @@ try
     //    .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
     //    .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
     //    .Build();
-
 }
 catch (Exception ex)
 {
@@ -125,14 +112,13 @@ public class User : BaseSync
 {
     public User()
     {
-        
-    }
-    public User(Guid id) : base(id)
-    {
-     
     }
 
-    public string Name { get;  set; } = string.Empty;
+    public User(Guid id) : base(id)
+    {
+    }
+
+    public string Name { get; set; } = string.Empty;
 }
 
 public class Estoque : BaseSync
