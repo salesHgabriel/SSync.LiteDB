@@ -84,6 +84,45 @@ namespace SSync.Client.LitebDB.Sync
                 );
         }
 
+        public BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+            
+            ArgumentNullException.ThrowIfNull(col);
+
+
+            Log("Insert row");
+            entity.CreateAt();
+
+            return col.Insert(entity);
+        }
+
+        public BsonValue UpdateSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+
+            ArgumentNullException.ThrowIfNull(col);
+
+
+            Log("update row");
+            entity.UpdateAt();
+
+            return col.Update(entity);
+        }
+
+        public BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+
+            ArgumentNullException.ThrowIfNull(col);
+
+
+            Log("delete row");
+            entity.DeleteAt();
+
+            return col.Update(entity);
+        }
+
         /// <summary>
         /// Update local database
         /// </summary>
@@ -142,7 +181,23 @@ namespace SSync.Client.LitebDB.Sync
             return schemaPush;
         }
 
-        public void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
+        public void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
+        {
+            if (_options?.Mode == Mode.DEBUG && _options.SaveLogOnFile)
+            {
+                using StreamReader r = File.OpenText($"{_options?.PathFile}\\{title}");
+                string? line;
+
+                Console.ForegroundColor = consoleColor;
+
+                while ((line = r.ReadLine()) != null)
+                {
+                    Console.WriteLine(line);
+                }
+            }
+        }
+
+        private void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
         {
             if (_options?.Mode == Mode.DEBUG)
             {
@@ -166,22 +221,6 @@ namespace SSync.Client.LitebDB.Sync
 
                     Console.ForegroundColor = consoleColor;
                     Console.WriteLine(msg.ToString());
-                }
-            }
-        }
-
-        public void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
-        {
-            if (_options?.Mode == Mode.DEBUG && _options.SaveLogOnFile)
-            {
-                using StreamReader r = File.OpenText($"{_options?.PathFile}\\{title}");
-                string? line;
-
-                Console.ForegroundColor = consoleColor;
-
-                while ((line = r.ReadLine()) != null)
-                {
-                    Console.WriteLine(line);
                 }
             }
         }
