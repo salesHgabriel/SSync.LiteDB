@@ -1,4 +1,4 @@
-﻿namespace SSync.Client.LitebDB.Abstractions
+﻿namespace SSync.Client.LitebDB.Abstractions.Sync
 {
     public enum StatusSync
     {

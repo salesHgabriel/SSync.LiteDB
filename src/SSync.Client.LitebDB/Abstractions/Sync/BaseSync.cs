@@ -1,12 +1,12 @@
 ﻿using LiteDB;
 
-namespace SSync.Client.LitebDB.Abstractions
+namespace SSync.Client.LitebDB.Abstractions.Sync
 {
     public abstract class BaseSync
     {
         protected BaseSync()
         {
-            
+
         }
         protected BaseSync(Guid id) : base() => Id = id;
 

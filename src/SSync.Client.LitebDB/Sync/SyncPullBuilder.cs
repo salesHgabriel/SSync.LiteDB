@@ -1,4 +1,5 @@
 ﻿using SSync.Client.LitebDB.Abstractions;
+using SSync.Client.LitebDB.Abstractions.Sync;
 
 namespace SSync.Client.LitebDB.Sync
 {

@@ -1,6 +1,6 @@
 ﻿
 using System.Text.Json.Serialization;
-using SSync.Client.LitebDB.Abstractions;
+using SSync.Client.LitebDB.Abstractions.Sync;
 
 namespace SSync.Client.LitebDB.Poco
 {
