@@ -7,11 +7,9 @@ namespace SSync.Client.LiteDB.Tests.Sync
 {
     public class PullChanges_Tests
     {
-
         [Fact]
         public void SetDatabaseLiteDbNull_SchoudReturnPullChangesExceptions()
         {
-
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
@@ -20,9 +18,8 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var documentName = "user";
             var now = DateTime.Now;
 
-
             //act
-     
+
             var sync = new Synchronize(null);
 
             Action act = () => sync.PullChangesResult<User>(lastPulledAt, documentName, now);
@@ -36,7 +33,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
         [Fact]
         public void LastPulledAtLessZero_ShouldReturnExceptionPullChangesException()
         {
-
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
@@ -64,20 +60,69 @@ namespace SSync.Client.LiteDB.Tests.Sync
             Assert.Equal("Range less of zero", exception.Message);
         }
 
-        //TODO: testing the insert/update/delete operations, method was called to update the dates
+        //insert
+        [Fact]
+        public void InsertDocumentSync_ShouldReturnCreatedAtMoreZero()
+        {
+            //arrange
+            var newUserid = Guid.NewGuid();
+            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+
+            var documentName = "user";
+
+            using var database = new LiteDatabase(new MemoryStream());
+
+            var sync = new Synchronize(database);
+
+            //act
+            var collection = database.GetCollection<User>(documentName);
+            sync.InsertSync(new User(newUserid)
+            {
+                Name = newUserName
+            }, collection);
+
+            //assert
+
+            var user = collection.FindById(newUserid);
+
+            Assert.True(user.CreatedAt > 0);
+        }
 
 
+        //insert
+        [Fact]
+        public void InsertDocumentSync_ShouldReturnStatusCreated()
+        {
+            //arrange
+            var newUserid = Guid.NewGuid();
+            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+
+            var documentName = "user";
+
+            using var database = new LiteDatabase(new MemoryStream());
+
+            var sync = new Synchronize(database);
+
+            //act
+            var collection = database.GetCollection<User>(documentName);
+            sync.InsertSync(new User(newUserid)
+            {
+                Name = newUserName
+            }, collection);
+
+            //assert
+
+            var user = collection.FindById(newUserid);
+
+            Assert.True(user.Status == StatusSync.CREATED);
+        }
 
 
-
-
-
-
+        //TODO: testing the update/delete operations, method was called to update the dates
 
         public class User(Guid id) : BaseSync(id)
         {
             public string Name { get; set; } = string.Empty;
         }
-
     }
 }
