@@ -85,6 +85,51 @@ namespace SSync.Client.LitebDB.Sync
         }
 
         /// <summary>
+        /// Wrapper to use search collection from id
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public T FindByIdSync<T>(Guid id, ILiteCollection<T> col) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(id);
+
+            ArgumentNullException.ThrowIfNull(col);
+
+            Log("Search row from id");
+
+            return col.FindById(id);
+        }
+
+
+
+        /// <summary>
+        /// Wrapper to use search collection from id
+        /// Search collection from by name, if not set search for default name of class
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public T FindByIdSync<T>(Guid id, string? colName) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(id);
+
+            ArgumentNullException.ThrowIfNull(colName);
+
+            colName ??= typeof(T).Name;
+
+            var col = _db.GetCollection<T>(colName);
+
+            if (col is null) ArgumentNullException.ThrowIfNull(col);
+
+            Log("Search row from id");
+
+            return col.FindById(id);
+        }
+
+        /// <summary>
         /// this abstraction focus set automatically set date on property createdAt
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -104,6 +149,57 @@ namespace SSync.Client.LitebDB.Sync
             return col.Insert(entity);
         }
 
+
+        /// <summary>
+        /// this abstraction focus set automatically set date on property createdAt
+        /// Search collection from by name, if not set search for default name of class
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public BsonValue InsertSync<T>(T entity, string? colName) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+
+            colName ??= typeof(T).Name;
+
+            var col = _db.GetCollection<T>(colName);
+
+            if (col is null) ArgumentNullException.ThrowIfNull(col);
+
+
+
+            Log("Insert row");
+            entity.CreateAt();
+
+            return col.Insert(entity);
+        }
+
+
+        /// <summary>
+        /// this abstraction focus set automatically set date on property updatedAt
+        /// Search collection from by name, if not set search for default name of class
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public BsonValue UpdateSync<T>(T entity, string? colName) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+
+            colName ??= typeof(T).Name;
+
+            var col = _db.GetCollection<T>(colName);
+
+            if (col is null) ArgumentNullException.ThrowIfNull(col);
+
+            Log("update row");
+            entity.UpdateAt();
+
+            return col.Update(entity);
+        }
 
         /// <summary>
         /// this abstraction focus set automatically set date on property updatedAt
@@ -140,6 +236,33 @@ namespace SSync.Client.LitebDB.Sync
             ArgumentNullException.ThrowIfNull(entity);
 
             ArgumentNullException.ThrowIfNull(col);
+
+
+            Log("delete row");
+            entity.DeleteAt();
+
+            return col.Update(entity);
+        }
+
+
+        /// <summary>
+        /// this abstraction focus set automatically set date on property deletedAt
+        /// DELETE IS LOGIC!!
+        /// Search collection from by name, if not set search for default name of class
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public BsonValue DeleteSync<T>(T entity, string? colName) where T : BaseSync
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+
+            colName ??= typeof(T).Name;
+
+            var col = _db.GetCollection<T>(colName);
+
+            if (col is null) ArgumentNullException.ThrowIfNull(col);
 
 
             Log("delete row");
