@@ -181,6 +181,66 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
 
         [Fact]
+        public void DeleteDocumentSync_ShouldReturnGuidDiffentEmpty()
+        {
+            //arrange
+            var newUserid = Guid.NewGuid();
+            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+
+            var documentName = "user";
+
+            using var database = new LiteDatabase(new MemoryStream());
+
+            var sync = new Synchronize(database);
+
+            //act
+            sync.InsertSync(new User(newUserid)
+            {
+                Name = newUserName
+            }, documentName);
+
+            var user = sync.FindByIdSync<User>(newUserid, documentName);
+
+            sync.DeleteSync(user, documentName);
+
+            //assert
+
+            var changes = sync.PullChangesResult<User>(0, documentName, DateTime.UtcNow);
+
+            var userDeleted = changes.Changes.Deleted.FirstOrDefault(g => g == newUserid);
+
+            Assert.True(userDeleted != Guid.Empty);
+        }
+
+        [Fact]
+        public void DeleteDocumentSync_ShouldReturnStatusDeleted()
+        {
+            //arrange
+            var newUserid = Guid.NewGuid();
+            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+
+            var documentName = "user";
+
+            using var database = new LiteDatabase(new MemoryStream());
+
+            var sync = new Synchronize(database);
+
+            //act
+            sync.InsertSync(new User(newUserid)
+            {
+                Name = newUserName
+            }, documentName);
+
+            var user = sync.FindByIdSync<User>(newUserid, documentName);
+
+            sync.DeleteSync(user, documentName);
+
+            //assert
+
+            Assert.True(user.Status == StatusSync.DELETED);
+        }
+
+        [Fact]
         public void InsertAndUpdatedAndDeleteRowsSync_ShouldReturnPullChangesWithSameMethods()
         {
        
