@@ -84,6 +84,13 @@ namespace SSync.Client.LitebDB.Sync
                 );
         }
 
+        /// <summary>
+        /// this abstraction focus set automatically set date on property createdAt
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(entity);
@@ -97,6 +104,14 @@ namespace SSync.Client.LitebDB.Sync
             return col.Insert(entity);
         }
 
+
+        /// <summary>
+        /// this abstraction focus set automatically set date on property updatedAt
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public BsonValue UpdateSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(entity);
@@ -110,6 +125,16 @@ namespace SSync.Client.LitebDB.Sync
             return col.Update(entity);
         }
 
+
+
+        /// <summary>
+        /// this abstraction focus set automatically set date on property deletedAt
+        /// DELETE IS LOGIC!!
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(entity);
