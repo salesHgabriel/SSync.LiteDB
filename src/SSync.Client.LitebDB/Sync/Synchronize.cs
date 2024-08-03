@@ -322,7 +322,9 @@ namespace SSync.Client.LitebDB.Sync
                 Log($"Total {totalDeleted} deleteds");
             }
 
-            _db.Commit();
+            var succeced = _db.Commit();
+
+            schemaPush.SetCommitDatabaseOperation(succeced);
 
             Log($"Commit transaction database");
 
