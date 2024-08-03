@@ -14,7 +14,13 @@ namespace SSync.Client.LitebDB.Poco
         public bool HasChanges => Changes is not null && (Changes.Created.Any() || Changes.Updated.Any() || Changes.Deleted.Any());
 
         [JsonIgnore]
-        public bool HasDeleted => Changes.Deleted.Any();
+        public bool HasDeleted => Changes?.Deleted?.Any() ?? false;
+
+        public void SetCommitDatabaseOperation(bool succeced) => CommitedDatabaseOperation = succeced;
+
+        [JsonIgnore]
+        public bool CommitedDatabaseOperation { get; private set; }
+
 
         public class Change
         {
