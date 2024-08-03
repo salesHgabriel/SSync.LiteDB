@@ -13,7 +13,7 @@ namespace SSync.Client.LitebDB.Sync
 
         public SyncPushBuilder(string databaseRemoteChanges)
         {
-            ArgumentNullException.ThrowIfNull(databaseRemoteChanges);
+            ArgumentException.ThrowIfNullOrEmpty(databaseRemoteChanges);
             _databaseRemoteChanges = JsonSerializer.Deserialize<JsonArray>(databaseRemoteChanges)!;
         }
 
