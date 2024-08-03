@@ -90,8 +90,13 @@ try
 
     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
 
+    //sending update database local changes [databaseLocal]
+    //post api/push  
+
+
     //simute server changes
-    // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
+    //api/pull 
+    // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json"); 
 
     //var pushBuilder = new SyncPushBuilder(responseServer);
 
