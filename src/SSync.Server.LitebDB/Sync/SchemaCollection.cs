@@ -66,16 +66,23 @@ namespace SSync.Server.LitebDB.Sync
             {
                 parameter.CurrentColletion = step.Parameter;
 
-                var method = typeof(SchemaCollection)
+                MethodInfo? method = typeof(SchemaCollection)
                     .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.Public)
                     .MakeGenericMethod(step.SyncType, parameter.GetType());
 
-                var task = (Task)method.Invoke(this, new object[] { parameter, options });
-                await task.ConfigureAwait(false);
+                if (method is null) throw new PullChangesException("Not found pull request handler");
 
-                var resultProperty = task.GetType().GetProperty("Result");
+                var task = (Task)method.Invoke(this, new object[] { parameter, options })!;
 
-                result.Add(resultProperty.GetValue(task));
+                if (task is not null)
+                {
+                    await task.ConfigureAwait(false);
+
+                    var resultProperty = task.GetType().GetProperty("Result");
+
+                    result.Add(resultProperty!.GetValue(task)!);
+                }
+                
             }
 
             return result;
