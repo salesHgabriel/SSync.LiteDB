@@ -21,11 +21,11 @@ try
         SaveLogOnFile = false
     });
 
-    var colUser = db.GetCollection<User>(colName);
+    //var colUser = db.GetCollection<User>(colName);
 
-    var user = new User(Guid.NewGuid()) { Name = "Oliveira" };
+    //var user = new User(Guid.NewGuid()) { Name = "Oliveira" };
 
-     sync.InsertSync(user, colUser);
+    // sync.InsertSync(user, colUser);
 
     //multipe create
 
@@ -96,14 +96,14 @@ try
 
     //simute server changes
     //api/pull 
-    // string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json"); 
+    string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
-    //var pushBuilder = new SyncPushBuilder(responseServer);
+    var pushBuilder = new SyncPushBuilder(responseServer);
 
-    //pushBuilder
-    //    .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
-    //    .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
-    //    .Build();
+    pushBuilder
+        .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
+        .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
+        .Build();
 }
 catch (Exception ex)
 {
