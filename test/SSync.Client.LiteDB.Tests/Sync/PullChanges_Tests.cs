@@ -15,14 +15,14 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
             var lastPulledAt = -1;
-            var documentName = "user";
+            var collectionName = "user";
             var now = DateTime.Now;
 
             //act
 
             var sync = new Synchronize(null);
 
-            Action act = () => sync.PullChangesResult<User>(lastPulledAt, documentName, now);
+            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName, now);
 
             //assert
             PullChangesException exception = Assert.Throws<PullChangesException>(act);
@@ -38,13 +38,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
             var lastPulledAt = -1;
-            var documentName = "user";
+            var collectionName = "user";
             var now = DateTime.Now;
 
             using var database = new LiteDatabase(new MemoryStream());
 
             //act
-            var collection = database.GetCollection<User>(documentName);
+            var collection = database.GetCollection<User>(collectionName);
             collection.Insert(new User(newUserid)
             {
                 Name = newUserName
@@ -52,7 +52,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(database);
 
-            Action act = () => sync.PullChangesResult<User>(lastPulledAt, documentName, now);
+            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName, now);
 
             //assert
             PullChangesException exception = Assert.Throws<PullChangesException>(act);

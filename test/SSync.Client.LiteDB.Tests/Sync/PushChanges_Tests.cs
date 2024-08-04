@@ -18,7 +18,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
             var lastPulledAt = -1;
-            var documentName = "user";
+            var collectionName = "user";
             var now = DateTime.Now;
 
             //act
@@ -41,7 +41,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
             var lastPulledAt = -1;
-            var documentName = "user";
+            var collectionName = "user";
             var now = DateTime.Now;
 
             //act
@@ -53,9 +53,9 @@ namespace SSync.Client.LiteDB.Tests.Sync
             Action act = () => sync.PushChangesResult((SchemaPush<User>)null);
 
             //assert
-            PushChangeException exception = Assert.Throws<PushChangeException>(act);
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(act);
 
-            Assert.Equal("Schemas changes is null", exception.Message);
+            Assert.Equal("Value cannot be null. (Parameter 'schemaPush')", exception.Message);
         }
 
 

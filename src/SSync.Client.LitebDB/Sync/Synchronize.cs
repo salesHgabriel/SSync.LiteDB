@@ -20,13 +20,13 @@ namespace SSync.Client.LitebDB.Sync
 
         /// <summary>
         /// if lastPulledAt is equal 0, load all rows for default
-        /// if documentName is null, get name of class  for default
+        /// if collectionName is null, get name of class  for default
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="lastPulledAt"></param>
-        /// <param name="documentName"></param>
+        /// <param name="collectionName"></param>
         /// <returns></returns>
-        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string documentName, DateTime now) where T : BaseSync
+        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string collectionName, DateTime now) where T : BaseSync
         {
             if (_db is null)
             {
@@ -43,9 +43,9 @@ namespace SSync.Client.LitebDB.Sync
 
             Log("Start fetch local changes");
 
-            documentName ??= typeof(T).Name;
+            collectionName ??= typeof(T).Name;
             var timestamp = now.Ticks;
-            var doc = _db.GetCollection<T>(documentName);
+            var doc = _db.GetCollection<T>(collectionName);
 
             if (doc is null)
             {
@@ -68,13 +68,13 @@ namespace SSync.Client.LitebDB.Sync
 
                 Log("Succefully fetch local all changes");
 
-                return new SchemaPullResult<T>(documentName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
+                return new SchemaPullResult<T>(collectionName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
             }
 
             Log($"Succefully fetch local changes from last pulled At {lastPulledAt}");
 
             return new SchemaPullResult<T>(
-                documentName,
+                collectionName,
                 timestamp,
                 new SchemaPullResult<T>.Change(
                     createdQuery.Where(d => d.CreatedAt > lastPulledAt).ToEnumerable(),
@@ -101,7 +101,6 @@ namespace SSync.Client.LitebDB.Sync
 
             return col.FindById(id);
         }
-
 
 
         /// <summary>
@@ -222,7 +221,6 @@ namespace SSync.Client.LitebDB.Sync
         }
 
 
-
         /// <summary>
         /// this abstraction focus set automatically set date on property deletedAt
         /// DELETE IS LOGIC!!
@@ -290,7 +288,7 @@ namespace SSync.Client.LitebDB.Sync
 
             Log($"Start push changes");
 
-            var col = _db.GetCollection<T>(schemaPush.Document);
+            var col = _db.GetCollection<T>(schemaPush.Collection);
 
             if (col is null)
             {

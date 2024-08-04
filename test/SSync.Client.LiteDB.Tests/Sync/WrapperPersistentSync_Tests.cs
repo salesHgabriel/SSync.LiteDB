@@ -8,13 +8,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
     public class WrapperPersistentSync_Tests
     {
         [Fact]
-        public void InsertDocumentSync_ShouldReturnCreatedAtMoreZero()
+        public void InsertCollectionSync_ShouldReturnCreatedAtMoreZero()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -25,23 +25,23 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
             //assert
 
-            var user = sync.FindByIdSync<User>(newUserid, documentName);
+            var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
             Assert.True(user.CreatedAt > 0);
         }
 
         [Fact]
-        public void InsertDocumentSync_ShouldReturnStatusCreated()
+        public void InsertCollectionSync_ShouldReturnStatusCreated()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -51,11 +51,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, documentName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
 
             var userCreated = changes.Changes.Created.FirstOrDefault(u => u.Id == newUserid);
 
@@ -63,13 +63,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
         }
 
         [Fact]
-        public void UpdateDocumentSync_ShouldReturnCreatedAtMoreZero()
+        public void UpdateCollectionSync_ShouldReturnCreatedAtMoreZero()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -79,15 +79,15 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
-            var user = sync.FindByIdSync<User>(newUserid, documentName);
+            var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
-            sync.UpdateSync(user, documentName);
+            sync.UpdateSync(user, collectionName);
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, documentName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
@@ -95,13 +95,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
         }
 
         [Fact]
-        public void UpdateDocumentSync_ShouldReturnStatusCreated()
+        public void UpdateCollectionSync_ShouldReturnStatusCreated()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -111,15 +111,15 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
-            var user = sync.FindByIdSync<User>(newUserid, documentName);
+            var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
-            sync.UpdateSync(user, documentName);
+            sync.UpdateSync(user, collectionName);
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, documentName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
@@ -127,13 +127,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
         }
 
         [Fact]
-        public void DeleteDocumentSync_ShouldReturnGuidDiffentEmpty()
+        public void DeleteCollectionSync_ShouldReturnGuidDiffentEmpty()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -143,15 +143,15 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
-            var user = sync.FindByIdSync<User>(newUserid, documentName);
+            var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
-            sync.DeleteSync(user, documentName);
+            sync.DeleteSync(user, collectionName);
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, documentName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
 
             var userDeleted = changes.Changes.Deleted.FirstOrDefault(g => g == newUserid);
 
@@ -159,13 +159,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
         }
 
         [Fact]
-        public void DeleteDocumentSync_ShouldReturnStatusDeleted()
+        public void DeleteCollectionSync_ShouldReturnStatusDeleted()
         {
             //arrange
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
 
-            var documentName = "user";
+            var collectionName = "user";
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -175,11 +175,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.InsertSync(new User(newUserid)
             {
                 Name = newUserName
-            }, documentName);
+            }, collectionName);
 
-            var user = sync.FindByIdSync<User>(newUserid, documentName);
+            var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
-            sync.DeleteSync(user, documentName);
+            sync.DeleteSync(user, collectionName);
 
             //assert
 

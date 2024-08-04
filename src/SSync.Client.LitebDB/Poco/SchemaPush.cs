@@ -6,7 +6,7 @@ namespace SSync.Client.LitebDB.Poco
 {
     public class SchemaPush<T> where T : BaseSync
     {
-        public string? Document { get; set; }
+        public string? Collection { get; set; }
         public long Timestamp { get; set; }
         public Change Changes { get; set; } = default!;
 

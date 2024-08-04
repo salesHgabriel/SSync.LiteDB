@@ -17,11 +17,11 @@ namespace SSync.Client.LitebDB.Sync
             _databaseRemoteChanges = JsonSerializer.Deserialize<JsonArray>(databaseRemoteChanges)!;
         }
 
-        public SyncPushBuilder AddPushSchemaSync<T>(Func<SchemaPush<T>, SchemaPush<T>> action, string documentName) where T : BaseSync
+        public SyncPushBuilder AddPushSchemaSync<T>(Func<SchemaPush<T>, SchemaPush<T>> action, string collectionName) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(action);
 
-            var filteredNode = _databaseRemoteChanges.First(node => node!["Document"]?.ToString() == documentName)!;
+            var filteredNode = _databaseRemoteChanges.First(node => node![nameof(SchemaPush<T>.Collection)]?.ToString() == collectionName)!;
 
             var doc = JsonSerializer.Deserialize<SchemaPush<T>>(filteredNode.ToJsonString())!;
 

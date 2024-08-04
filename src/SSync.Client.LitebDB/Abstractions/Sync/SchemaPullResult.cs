@@ -6,14 +6,14 @@
         {
 
         }
-        public SchemaPullResult(string? documentName, long timestamp, Change changesModel)
+        public SchemaPullResult(string? collection, long timestamp, Change changesModel)
         {
-            Document = documentName;
+            Collection = collection;
             Timestamp = timestamp;
             Changes = changesModel;
         }
 
-        public string? Document { get; private set; }
+        public string? Collection { get; private set; }
         public long? Timestamp { get; private set; } = 0;
         public Change Changes { get; private set; } = default!;
 
