@@ -7,11 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Sync\" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SSync.Server.LitebDB\SSync.Server.LitebDB.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Examples\" />
   </ItemGroup>
 
 </Project>
