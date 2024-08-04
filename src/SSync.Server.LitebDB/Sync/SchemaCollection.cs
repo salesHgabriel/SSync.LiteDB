@@ -25,6 +25,8 @@ namespace SSync.Server.LitebDB.Sync
         {
             if (paramenter.Colletions.Length == 0) throw new PullChangesException("You need set collections");
 
+            if (string.IsNullOrEmpty(paramenter.CurrentColletion)) throw new PullChangesException("Not found collection");
+
             DateTime lastPulledAt = DateTimeOffset.FromUnixTimeMilliseconds(paramenter.Timestamp).DateTime;
 
             var timestamp = options?.TimeConfig == Time.UTC ? DateTime.UtcNow : DateTime.Now;
