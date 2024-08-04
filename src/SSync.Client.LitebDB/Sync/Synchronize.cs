@@ -223,7 +223,7 @@ namespace SSync.Client.LitebDB.Sync
 
         /// <summary>
         /// this abstraction focus set automatically set date on property deletedAt
-        /// DELETE IS LOGIC!!
+        /// Its Soft Delete!!
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
@@ -245,7 +245,7 @@ namespace SSync.Client.LitebDB.Sync
 
         /// <summary>
         /// this abstraction focus set automatically set date on property deletedAt
-        /// DELETE IS LOGIC!!
+        /// Its Soft Delete!!
         /// Search collection from by name, if not set search for default name of class
         /// </summary>
         /// <typeparam name="T"></typeparam>
