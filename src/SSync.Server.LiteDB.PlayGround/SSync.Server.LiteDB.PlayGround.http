@@ -1,0 +1,6 @@
+@SSync.Server.LiteDB.PlayGround_HostAddress = http://localhost:5130
+
+GET {{SSync.Server.LiteDB.PlayGround_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
