@@ -2,14 +2,13 @@
 using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Sync;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
 
 try
 {
     var colName = nameof(User);
     var colNameEstoque = nameof(Estoque);
 
-    string dirApp = Directory.GetParent(Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).ToString()).ToString()).ToString() + "\\Examples\\"; // Only test, NOT PRD !!
+    string dirApp = Directory.GetParent(Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory)!.ToString())!.ToString())!.ToString()! + "\\Examples\\"; // Only test, NOT PRD !!
 
     var path = dirApp + "MyData.db";
 
