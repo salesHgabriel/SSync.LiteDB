@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
-using System.Reflection.Metadata;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +62,7 @@ app.MapGet("/create", async ([FromServices] TestDbContext cxt) =>
     var user = new User()
     {
         Id = Guid.NewGuid(),
-        Name = $" Cotoso {DateTime.UtcNow.ToUnixTimestamp()}",
+        Name = $" Cotoso {new Random().Next()}",
         CreatedAt = now,
         UpdatedAt = now
     };
@@ -95,7 +94,7 @@ app.MapGet("/update/{userId}", async ( Guid userId, [FromServices] TestDbContext
         return Results.NotFound();
     }
 
-    user.Name = $"Update {DateTime.UtcNow.ToUnixTimestamp()}";
+    user.Name = $"Update {new Random().Next()}";
     
     user.UpdatedAt = DateTime.UtcNow;
 

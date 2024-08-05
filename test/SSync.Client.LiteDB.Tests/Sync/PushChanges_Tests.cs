@@ -18,13 +18,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
-            var lastPulledAt = -1;
-            var collectionName = "user";
             var now = DateTime.Now;
 
             //act
 
-            var sync = new Synchronize(null);
+            var sync = new Synchronize(null!);
 
             Action act = () => sync.PushChangesResult(new LitebDB.Poco.SchemaPush<User>());
 
@@ -41,8 +39,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newUserid = Guid.NewGuid();
             var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
-            var lastPulledAt = -1;
-            var collectionName = "user";
             var now = DateTime.Now;
 
             //act
@@ -51,7 +47,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(database);
 
-            Action act = () => sync.PushChangesResult((SchemaPush<User>)null);
+            Action act = () => sync.PushChangesResult((SchemaPush<User>)null!);
 
             //assert
             ArgumentNullException exception = Assert.Throws<ArgumentNullException>(act);

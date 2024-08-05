@@ -92,7 +92,7 @@ namespace SSync.Server.LitebDB.Sync
 
                 if (method is null) throw new PullChangesException("Not found pull request handler");
 
-                var task = (Task)method.Invoke(this, new object[] { parameter, options })!;
+                var task = (Task)method.Invoke(this, new object?[] { parameter, options })!;
 
                 if (task is not null)
                 {

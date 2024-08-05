@@ -21,7 +21,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //act
 
-            var sync = new Synchronize(null);
+            var sync = new Synchronize(null!);
 
             Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName, now);
 
