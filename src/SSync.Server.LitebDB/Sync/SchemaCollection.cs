@@ -3,6 +3,7 @@ using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Engine.Builders;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Reflection;
 
 namespace SSync.Server.LitebDB.Sync
@@ -27,9 +28,7 @@ namespace SSync.Server.LitebDB.Sync
 
             if (string.IsNullOrEmpty(paramenter.CurrentColletion)) throw new PullChangesException("Not found collection");
 
-            DateTime lastPulledAt = DateTimeOffset.FromUnixTimeMilliseconds(paramenter.Timestamp).DateTime;
-
-            var timestamp = options?.TimeConfig == Time.UTC ? DateTime.UtcNow : DateTime.Now;
+            var timestamp = options?.TimeConfig == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
 
             var handler = _syncServices.PullRequestHandler<TCollection, TParamenter>();
 
@@ -37,6 +36,7 @@ namespace SSync.Server.LitebDB.Sync
 
             if (paramenter.Timestamp == 0)
             {
+
                 var createds = (await query)
                     .Where(entity => entity.DeletedAt == null)
                     .ToList();
@@ -44,16 +44,33 @@ namespace SSync.Server.LitebDB.Sync
                 var updateds = Enumerable.Empty<TCollection>();
                 var deleteds = new List<Guid>();
 
-                return new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.Ticks, new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
+                return new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
             }
+
+            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp();
 
             return new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
-                timestamp.Ticks,
+                timestamp.ToUnixTimestamp(),
                 new SchemaPullResult<TCollection>.Change(
-                   (await query).Where(d => d.CreatedAt > lastPulledAt).ToList(),
-                   (await query).Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.UpdatedAt > lastPulledAt).ToList(),
-                   (await query).Where(d => d.CreatedAt <= lastPulledAt).Where(d => d.DeletedAt > lastPulledAt).Select(d => d.Id).ToList()
+                   
+                    created:(await query)
+                            .Where(d => d.CreatedAt > lastPulledAt)
+                            .Where(d => !d.DeletedAt.HasValue)
+                            .ToList(),
+
+                   updated:(await query)
+                            .Where(d => d.CreatedAt <= lastPulledAt)
+                            .Where(d => d.UpdatedAt > lastPulledAt)
+                            .Where(d => !d.DeletedAt.HasValue)
+                            .ToList(),
+
+                   deleted:(await query)
+                            .Where(d => d.CreatedAt <= lastPulledAt)
+                            .Where(d => d.DeletedAt > lastPulledAt)
+                            .Where(d => d.DeletedAt.HasValue)
+                            .Select(d => d.Id)
+                            .ToList()
                     )
                 );
         }
@@ -68,8 +85,8 @@ namespace SSync.Server.LitebDB.Sync
             {
                 parameter.CurrentColletion = step.Parameter;
 
-                MethodInfo? method = typeof(SchemaCollection)
-                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.Public)
+                MethodInfo? method = typeof(SchemaCollection)!
+                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.Public)!
                     .MakeGenericMethod(step.SyncType, parameter.GetType());
 
                 if (method is null) throw new PullChangesException("Not found pull request handler");

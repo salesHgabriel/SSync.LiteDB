@@ -12,7 +12,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 
@@ -39,7 +39,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 
@@ -67,7 +67,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 
@@ -99,7 +99,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 
@@ -131,7 +131,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 
@@ -163,7 +163,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var collectionName = "user";
 

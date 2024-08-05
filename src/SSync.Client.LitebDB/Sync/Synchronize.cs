@@ -3,6 +3,7 @@ using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Poco;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Text;
 
 namespace SSync.Client.LitebDB.Sync
@@ -44,7 +45,7 @@ namespace SSync.Client.LitebDB.Sync
             Log("Start fetch local changes");
 
             collectionName ??= typeof(T).Name;
-            var timestamp = now.Ticks;
+            var timestamp = now.ToUnixTimestamp();
             var doc = _db.GetCollection<T>(collectionName);
 
             if (doc is null)

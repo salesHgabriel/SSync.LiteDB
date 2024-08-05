@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
 {
@@ -16,7 +17,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// <param name="now"></param>
         public void CreateAt(DateTime? now = null)
         {
-            CreatedAt = now is null ? DateTime.UtcNow.Ticks : now.Value.Ticks;
+            CreatedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
             Status = StatusSync.CREATED;
         }
 
@@ -26,7 +27,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// <param name="now"></param>
         public void UpdateAt(DateTime? now = null)
         {
-            UpdatedAt = now is null ? DateTime.UtcNow.Ticks : now.Value.Ticks;
+            UpdatedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
             Status = StatusSync.UPDATED;
         }
 
@@ -37,7 +38,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// <param name="now"></param>
         public void DeleteAt(DateTime? now = null)
         {
-            DeletedAt = now is null ? DateTime.UtcNow.Ticks : now.Value.Ticks;
+            DeletedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
             Status = StatusSync.DELETED;
         }
 

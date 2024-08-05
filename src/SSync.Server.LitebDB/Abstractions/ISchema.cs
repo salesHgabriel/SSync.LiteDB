@@ -9,10 +9,10 @@ namespace SSync.Server.LitebDB.Abstractions
         }
         public Guid Id { get;  }
 
-        public DateTime CreatedAt { get;}
+        public DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get;}
+        public DateTime UpdatedAt { get; set; }
 
-        public DateTime? DeletedAt { get;}
+        public DateTime? DeletedAt { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var lastPulledAt = -1;
             var collectionName = "user";
@@ -38,7 +38,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var lastPulledAt = -1;
             var collectionName = "user";
@@ -67,7 +67,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
             {
-                Name = $"Cotoso {DateTime.UtcNow.Ticks}"
+                Name = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}"
             }).ToArray();
 
     
@@ -98,7 +98,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newCreated = pullLocalCliente.Changes.Created.Where(u => u.Id != guidFistUserCreate);
 
 
-            var changesServer =  new SchemaPullResult<User>(colUserName, now.Ticks, new SchemaPullResult<User>.Change(newCreated, pullLocalCliente.Changes.Updated, newDeleted));
+            var changesServer =  new SchemaPullResult<User>(colUserName, now.ToUnixTimestamp(), new SchemaPullResult<User>.Change(newCreated, pullLocalCliente.Changes.Updated, newDeleted));
 
             var listChanges = System.Text.Json.JsonSerializer.Serialize(changesServer);
 

@@ -2,6 +2,7 @@
 using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Sync;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 
 try
 {
@@ -21,7 +22,7 @@ try
         SaveLogOnFile = false
     });
 
-    //var colUser = db.GetCollection<User>(colName);
+    var colUser = db.GetCollection<User>(colName);
 
     //var user = new User(Guid.NewGuid()) { Name = "Oliveira" };
 
@@ -29,18 +30,18 @@ try
 
     //multipe create
 
-    //for (int i = 0; i < 100; i++)
+    //for (int i = 0; i < 50; i++)
     //{
     //    var user = new User(Guid.NewGuid())
     //    {
-    //        Name = $"Cotoso {DateTime.UtcNow.Ticks}"
+    //        Name = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}"
     //    };
 
     //    user.CreateAt();
     //    colUser.Insert(user);
     //}
 
-    //var usersUpdateTeste = colUser.Query().Where(u => u.Name.StartsWith("Gabriel Sales")).Limit(10).ToList();
+    //var usersUpdateTeste = colUser.Query().Where(u => u.Name.StartsWith("Cotoso ")).Limit(10).ToList();
 
     //foreach (var us in usersUpdateTeste)
     //{
@@ -50,12 +51,9 @@ try
     //    colUser.Update(us);
     //}
 
-    //var user = colUser.FindOne(u => u.Id == Guid.Parse("02e78c9a-0521-4503-a605-93e2caab183f"));
+    //var user = colUser.FindOne(u => u.Id == Guid.Parse(" id para deletar"));
 
-    //user.Name = "Cotoso update 3";
-
-    //user.UpdateAt();
-
+    
     //user.DeleteAt();
 
     //colUser.Update(user);
@@ -96,14 +94,14 @@ try
 
     //simute server changes
     //api/pull 
-    string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
+    //string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
-    var pushBuilder = new SyncPushBuilder(responseServer);
+    //var pushBuilder = new SyncPushBuilder(responseServer);
 
-    pushBuilder
-        .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
-        .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
-        .Build();
+    //pushBuilder
+    //    .AddPushSchemaSync<User>(change => sync.PushChangesResult(change), colName)
+    //    .AddPushSchemaSync<Estoque>(change => sync.PushChangesResult(change), colNameEstoque)
+    //    .Build();
 }
 catch (Exception ex)
 {

@@ -12,7 +12,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var lastPulledAt = -1;
             var collectionName = "user";
@@ -35,7 +35,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.Ticks}";
+            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
 
             var lastPulledAt = -1;
             var collectionName = "user";
@@ -68,7 +68,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
             {
-                Name = $"Cotoso {DateTime.UtcNow.Ticks}"
+                Name = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}"
             }).ToArray();
 
             using var database = new LiteDatabase(new MemoryStream());

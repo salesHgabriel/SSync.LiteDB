@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
+using System.Reflection.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,22 +36,36 @@ await CreateDBIfNotExistAsync(app.Services, app.Logger);
 app.UseHttpsRedirection();
 
 
+
+app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+{
+
+
+    var pullChangesRemoter = await schemaCollection.PullChangesAsync(parameter);
+
+    return Results.Ok(pullChangesRemoter);
+});
+
+
 app.MapGet("/list", async ([FromServices] TestDbContext cxt) =>
 {
 
     var usersDb = await cxt.User.ToListAsync();
+    var financesDb = await cxt.Finances.ToListAsync();
 
-    return Results.Ok(usersDb);
+    return Results.Ok(new { usersDb, financesDb });
 });
 
 
 app.MapGet("/create", async ([FromServices] TestDbContext cxt) =>
 {
-
+    var now = DateTime.UtcNow;
     var user = new User()
     {
         Id = Guid.NewGuid(),
-        Name = $" Cotoso {DateTime.UtcNow.Ticks}",
+        Name = $" Cotoso {DateTime.UtcNow.ToUnixTimestamp()}",
+        CreatedAt = now,
+        UpdatedAt = now
     };
     cxt.User.Add(user);
 
@@ -56,27 +73,61 @@ app.MapGet("/create", async ([FromServices] TestDbContext cxt) =>
     {
         Id = Guid.NewGuid(),
         Price = new Random().Next(),
+        CreatedAt = now,
+        UpdatedAt = now
     };
 
     cxt.Finances.Add(finance);
 
 
     var res = await cxt.SaveChangesAsync();
+    return Results.Ok(res);
+});
+
+app.MapGet("/update/{userId}", async ( Guid userId, [FromServices] TestDbContext cxt) =>
+{
+    var now = DateTime.UtcNow;
+
+    var user = cxt.User.SingleOrDefault(u => u.Id == userId);
+
+    if (user is null)
+    {
+        return Results.NotFound();
+    }
+
+    user.Name = $"Update {DateTime.UtcNow.ToUnixTimestamp()}";
+    
+    user.UpdatedAt = DateTime.UtcNow;
+
+    cxt.User.Update(user);
+
+    var res = await cxt.SaveChangesAsync();
+
 
 
     return Results.Ok(res);
 });
 
-
-app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+app.MapGet("/delete/{userId}", async (Guid userId ,TestDbContext cxt) =>
 {
+    var now = DateTime.UtcNow;
+   
+    var user =  cxt.User.SingleOrDefault(u => u.Id == userId);
+
+    if (user is null)
+    {
+        return Results.NotFound();
+    }
+
+    user.DeletedAt = DateTime.UtcNow;
+
+    cxt.User.Update(user);
+
+    var res = await cxt.SaveChangesAsync();
 
 
-   var pullChangesRemoter = await  schemaCollection.PullChangesAsync(parameter);
-
-    return Results.Ok(pullChangesRemoter);
+    return Results.Ok(res);
 });
-
 
 
 
@@ -100,18 +151,40 @@ class TestDbContext : DbContext
         : base(options) { }
     public DbSet<User> User => Set<User>();
     public DbSet<Finance> Finances => Set<Finance>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Id).HasConversion(new GuidToStringConverter());
+
+        modelBuilder.Entity<Finance>()
+            .Property(u => u.Id).HasConversion(new GuidToStringConverter());
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
 
 class User
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
 }
 
 class Finance
 {
     public Guid Id { get; set; }
     public double Price { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
 }
 
 
@@ -159,6 +232,9 @@ class PullUserRequesHandler : ISSyncPullRequest<UserSync, PlayParamenter>
         var users =  await _ctx.User.Select(u => new UserSync(u.Id)
         {
             Name = u.Name,
+            CreatedAt = u.CreatedAt,
+            DeletedAt = u.DeletedAt,
+            UpdatedAt = u.UpdatedAt
         }).ToListAsync();
 
         return users;
@@ -180,6 +256,9 @@ class PullFinanceRequesHandler : ISSyncPullRequest<FinanceSync, PlayParamenter>
         var finances = await _ctx.User.Select(u => new FinanceSync(u.Id)
         {
             Price = new Random().Next(100),
+            CreatedAt = u.CreatedAt,
+            DeletedAt = u.DeletedAt,
+            UpdatedAt = u.UpdatedAt
         }).ToListAsync();
 
         return finances;
