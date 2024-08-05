@@ -39,7 +39,7 @@ namespace SSync.Shared.ClientServer.LitebDB.Extensions
 
         public static DateTime FromUnixTimestamp(this long timestamp, Time? time = Time.UTC)
         {
-            var offset = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+            var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
 
             return time == Time.UTC ? offset.UtcDateTime : offset.LocalDateTime;
         }
