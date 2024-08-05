@@ -1,6 +1,7 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Sync;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 using static SSync.Client.LiteDB.Tests.Sync.PullChanges_Tests;
 
 namespace SSync.Client.LiteDB.Tests.Sync

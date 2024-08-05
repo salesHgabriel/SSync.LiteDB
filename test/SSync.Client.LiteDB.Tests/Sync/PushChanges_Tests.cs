@@ -4,6 +4,7 @@ using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Poco;
 using SSync.Client.LitebDB.Sync;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
+using SSync.Shared.ClientServer.LitebDB.Extensions;
 
 namespace SSync.Client.LiteDB.Tests.Sync
 {

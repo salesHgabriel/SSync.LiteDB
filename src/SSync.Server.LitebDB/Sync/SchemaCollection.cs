@@ -2,6 +2,7 @@
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Engine.Builders;
+using SSync.Shared.ClientServer.LitebDB.Enums;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Reflection;
@@ -47,7 +48,7 @@ namespace SSync.Server.LitebDB.Sync
                 return new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
             }
 
-            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp();
+            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp(options?.TimeConfig);
 
             return new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,

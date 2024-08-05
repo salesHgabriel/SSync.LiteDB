@@ -1,4 +1,5 @@
-﻿using SSync.Server.LitebDB.Abstractions;
+﻿
+using SSync.Shared.ClientServer.LitebDB.Enums;
 
 namespace SSync.Server.LitebDB.Engine
 {
