@@ -7,5 +7,6 @@ namespace SSync.Server.LitebDB.Abstractions.Builders
         IExecutionOrderStep By<TSync>(string collection) where TSync : ISchema;
         IExecutionOrderStep ThenBy<TSync>(string collection) where TSync : ISchema;
         Task ExecuteAsync<TParameter>(TParameter parameter, string[] filter) where TParameter : SSyncParamenter;
+        List<(Type SyncType, string Parameter)> GetSteps();
     }
 }

@@ -36,7 +36,7 @@ namespace SSync.Server.LitebDB.Engine.Builders
                     var handler = Activator.CreateInstance(handlerType) as ISSyncPullRequest<ISchema, TParameter>;
                     if (handler != null)
                     {
-                        var task = await handler.Query(parameter);
+                        var task = await handler.QueryAsync(parameter);
                     }
                 }
             }

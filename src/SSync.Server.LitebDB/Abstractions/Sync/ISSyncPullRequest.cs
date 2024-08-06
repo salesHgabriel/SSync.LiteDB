@@ -6,6 +6,6 @@ namespace SSync.Server.LitebDB.Abstractions.Sync
     where TSchema : ISchema
     where TParameter : SSyncParamenter
     {
-        Task<IEnumerable<TSchema>> Query(TParameter parameter);
+        Task<IEnumerable<TSchema>> QueryAsync(TParameter parameter);
     }
 }

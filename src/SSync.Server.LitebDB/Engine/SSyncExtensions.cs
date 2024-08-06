@@ -19,20 +19,25 @@ namespace SSync.Server.LitebDB.Engine
                         .AddClasses(classe => classe.AssignableTo(typeof(ISSyncServices)))
                             .AsImplementedInterfaces()
                             .WithScopedLifetime()
-                        .AddClasses(classe => classe.AssignableTo(typeof(ISSyncPullRequest<,>)))
+                       .AddClasses(classe => classe.AssignableTo(typeof(ISSyncPullRequest<,>)))
                             .AsImplementedInterfaces()
                             .WithScopedLifetime());
 
+
+
             services.AddScoped<ISchemaCollection, SchemaCollection>();
 
+            //var builder = new ExecutionOrderBuilder();
+            //optionsPullChanges(builder);
 
-            var builder = new ExecutionOrderBuilder();
-            optionsPullChanges(builder);
+            //services.AddSingleton(builder);
 
-            services.AddSingleton(builder);
-
-            //services.Add(new ServiceDescriptor(typeof(WatermelonSchemaConfiguration<TSchemaCollection>), provider => new WatermelonSchemaConfiguration<TSchemaCollection>(provider.GetRequiredService<ISSyncServices<TSchemaCollection>>()), serviceLifetime));
-
+            services.AddScoped<IExecutionOrderStep, ExecutionOrderBuilder>(sp =>
+            {
+                var builder = new ExecutionOrderBuilder();
+                optionsPullChanges(builder);
+                return builder;
+            });
 
 
             return services;

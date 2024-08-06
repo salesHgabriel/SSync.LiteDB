@@ -83,7 +83,7 @@ app.MapGet("/create", async ([FromServices] TestDbContext cxt) =>
     return Results.Ok(res);
 });
 
-app.MapGet("/update/{userId}", async ( Guid userId, [FromServices] TestDbContext cxt) =>
+app.MapGet("/user-update/{userId}", async ( Guid userId, [FromServices] TestDbContext cxt) =>
 {
     var now = DateTime.UtcNow;
 
@@ -107,11 +107,58 @@ app.MapGet("/update/{userId}", async ( Guid userId, [FromServices] TestDbContext
     return Results.Ok(res);
 });
 
-app.MapGet("/delete/{userId}", async (Guid userId ,TestDbContext cxt) =>
+
+app.MapGet("/finance-update/{id}", async (Guid id, [FromServices] TestDbContext cxt) =>
 {
     var now = DateTime.UtcNow;
-   
-    var user =  cxt.User.SingleOrDefault(u => u.Id == userId);
+
+    var finance = cxt.Finances.SingleOrDefault(u => u.Id == id);
+
+    if (finance is null)
+    {
+        return Results.NotFound();
+    }
+
+    finance.Price = new Random().Next();
+
+    finance.UpdatedAt = DateTime.UtcNow;
+
+    cxt.Finances.Update(finance);
+
+    var res = await cxt.SaveChangesAsync();
+
+
+
+    return Results.Ok(res);
+});
+
+app.MapGet("/finance-delete/{id}", async (Guid id ,TestDbContext cxt) =>
+{
+    var now = DateTime.UtcNow;
+
+    var finance = cxt.Finances.SingleOrDefault(f => f.Id == id);
+
+    if (finance is null)
+    {
+        return Results.NotFound();
+    }
+
+    finance.DeletedAt = DateTime.UtcNow;
+
+    cxt.Finances.Update(finance);
+
+
+    var res = await cxt.SaveChangesAsync();
+
+
+    return Results.Ok(res);
+});
+
+app.MapGet("/user-delete/{id}", async (Guid id, TestDbContext cxt) =>
+{
+    var now = DateTime.UtcNow;
+
+    var user = cxt.User.SingleOrDefault(u => u.Id == id);
 
     if (user is null)
     {
@@ -121,6 +168,9 @@ app.MapGet("/delete/{userId}", async (Guid userId ,TestDbContext cxt) =>
     user.DeletedAt = DateTime.UtcNow;
 
     cxt.User.Update(user);
+
+
+
 
     var res = await cxt.SaveChangesAsync();
 
@@ -225,7 +275,7 @@ class PullUserRequesHandler : ISSyncPullRequest<UserSync, PlayParamenter>
         _ctx = ctx;
     }
 
-    public async Task<IEnumerable<UserSync>> Query(PlayParamenter parameter)
+    public async Task<IEnumerable<UserSync>> QueryAsync(PlayParamenter parameter)
     {
 
         var users =  await _ctx.User.Select(u => new UserSync(u.Id)
@@ -250,9 +300,9 @@ class PullFinanceRequesHandler : ISSyncPullRequest<FinanceSync, PlayParamenter>
         _ctx = ctx;
     }
 
-    public async Task<IEnumerable<FinanceSync>> Query(PlayParamenter parameter)
+    public async Task<IEnumerable<FinanceSync>> QueryAsync(PlayParamenter parameter)
     {
-        var finances = await _ctx.User.Select(u => new FinanceSync(u.Id)
+        var finances = await _ctx.Finances.Select(u => new FinanceSync(u.Id)
         {
             Price = new Random().Next(100),
             CreatedAt = u.CreatedAt,

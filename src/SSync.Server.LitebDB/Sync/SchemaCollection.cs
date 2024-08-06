@@ -1,7 +1,7 @@
 ﻿using SSync.Server.LitebDB.Abstractions;
+using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
-using SSync.Server.LitebDB.Engine.Builders;
 using SSync.Shared.ClientServer.LitebDB.Enums;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
@@ -13,9 +13,10 @@ namespace SSync.Server.LitebDB.Sync
     {
         private readonly ISSyncServices _syncServices;
 
-        private readonly ExecutionOrderBuilder _builder;
+        private readonly IExecutionOrderStep _builder;
+        //private readonly ExecutionOrderStep _builder; // TODO: test: USE SINGLETON 
 
-        public SchemaCollection(ISSyncServices syncServices, ExecutionOrderBuilder builder)
+        public SchemaCollection(ISSyncServices syncServices, IExecutionOrderStep builder)
         {
             _syncServices = syncServices;
             _builder = builder;
@@ -33,12 +34,11 @@ namespace SSync.Server.LitebDB.Sync
 
             var handler = _syncServices.PullRequestHandler<TCollection, TParamenter>();
 
-            var query = handler.Query(paramenter);
+            var query = await handler.QueryAsync(paramenter);
 
             if (paramenter.Timestamp == 0)
             {
-
-                var createds = (await query)
+                var createds = query
                     .Where(entity => entity.DeletedAt == null)
                     .ToList();
 
@@ -54,24 +54,44 @@ namespace SSync.Server.LitebDB.Sync
                 paramenter.CurrentColletion,
                 timestamp.ToUnixTimestamp(),
                 new SchemaPullResult<TCollection>.Change(
-                   
-                    created:(await query)
-                            .Where(d => d.CreatedAt > lastPulledAt)
-                            .Where(d => !d.DeletedAt.HasValue)
-                            .ToList(),
 
-                   updated:(await query)
-                            .Where(d => d.CreatedAt <= lastPulledAt)
-                            .Where(d => d.UpdatedAt > lastPulledAt)
-                            .Where(d => !d.DeletedAt.HasValue)
-                            .ToList(),
+                     //created: query
+                     //         .Where(d => d.CreatedAt > lastPulledAt)
+                     //         .Where(d => d.CreatedAt <= timestamp)
+                     //         .Where(d => !d.DeletedAt.HasValue)
+                     //         .ToList(),
 
-                   deleted:(await query)
-                            .Where(d => d.CreatedAt <= lastPulledAt)
-                            .Where(d => d.DeletedAt > lastPulledAt)
-                            .Where(d => d.DeletedAt.HasValue)
-                            .Select(d => d.Id)
-                            .ToList()
+                     //updated: query
+                     //         .Where(d => d.CreatedAt <= lastPulledAt)
+                     //         .Where(d => d.UpdatedAt > lastPulledAt)
+                     //         .Where(d => d.UpdatedAt <= timestamp)
+                     //         .Where(d => !d.DeletedAt.HasValue)
+
+                     //         .ToList(),
+
+                     //deleted: query
+                     //         .Where(d => d.CreatedAt <= lastPulledAt)
+                     //         .Where(d => d.DeletedAt > lastPulledAt)
+                     //         .Where(d => d.DeletedAt <= timestamp)
+                     //         .Where(d => d.DeletedAt.HasValue)
+                     //         .Select(d => d.Id)
+                     //         .ToList()
+
+                     created: query
+                             .Where(d => d.CreatedAt > lastPulledAt)
+                             .ToList(),
+
+                    updated: query
+                             .Where(d => d.CreatedAt <= lastPulledAt)
+                             .Where(d => d.UpdatedAt > lastPulledAt)
+                             .ToList(),
+
+                    deleted: query
+                             .Where(d => d.CreatedAt <= lastPulledAt)
+                             .Where(d => d.DeletedAt > lastPulledAt)
+                             .Select(d => d.Id)
+                             .Distinct()
+                             .ToList()
                     )
                 );
         }
@@ -100,9 +120,13 @@ namespace SSync.Server.LitebDB.Sync
 
                     var resultProperty = task.GetType().GetProperty("Result");
 
-                    result.Add(resultProperty!.GetValue(task)!);
+                    var collectionResult = resultProperty?.GetValue(task);
+
+                    if (collectionResult is not null)
+                    {
+                        result.Add(collectionResult);
+                    }
                 }
-                
             }
 
             return result;
