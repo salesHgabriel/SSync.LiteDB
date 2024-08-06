@@ -22,7 +22,7 @@ namespace SSync.Server.LitebDB.Sync
             _builder = builder;
         }
 
-        public async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter, SSyncOptions? options = null)
+        private async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter, SSyncOptions? options = null)
                 where TCollection : ISchema
                 where TParamenter : SSyncParamenter
         {
@@ -107,7 +107,7 @@ namespace SSync.Server.LitebDB.Sync
                 parameter.CurrentColletion = step.Parameter;
 
                 MethodInfo? method = typeof(SchemaCollection)!
-                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.Public)!
+                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(step.SyncType, parameter.GetType());
 
                 if (method is null) throw new PullChangesException("Not found pull request handler");
