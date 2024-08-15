@@ -56,7 +56,7 @@ app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromSer
     {
         Time = Convert.ToInt32(query["time"]),
         Colletions = query["colletions"].ToArray()!,
-        Timestamp = long.TryParse(query["timestamp"], out var timestamp) ? timestamp : 0
+        Timestamp = long.TryParse(query["timestamp"], out long timestamp) ? timestamp : 0
     };
 
     var isOk = await schemaCollection.PushChangesAsync(changes, parameter, new SSyncOptions()

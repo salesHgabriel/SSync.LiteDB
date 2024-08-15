@@ -94,9 +94,15 @@ namespace SSync.Server.LitebDB.Sync
 
                 await _sSyncDbContextTransaction.BeginTransactionSyncAsync();
 
+                Log("Open Transaction database");
+
+
                 var schemaChanges = await ExecuteChanges(changes, parameter);
 
                 await _sSyncDbContextTransaction.CommitTransactionSyncAsync();
+
+                Log("Commit Transaction database");
+
 
                 return true;
             }
