@@ -10,6 +10,7 @@ using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Data;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -41,7 +42,22 @@ namespace SSync.Server.LitebDB.Sync
 
         public async Task<List<object>> PullChangesAsync(SSyncParamenter parameter, SSyncOptions? options = null)
         {
+            if (parameter.Colletions.Length == 0)
+            {
+                Log($"Error collection is required", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("You need set collections");
+            }
+
+            if (parameter.Timestamp < 0)
+            {
+                Log($"You can't timespamp to search less zero", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("Timestamp should be zero or more");
+            }
+
             _options = options;
+
             var result = new List<object>();
 
             Log($"Start pull changes");
