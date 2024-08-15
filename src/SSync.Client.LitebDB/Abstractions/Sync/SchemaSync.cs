@@ -3,13 +3,13 @@ using SSync.Shared.ClientServer.LitebDB.Extensions;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
 {
-    public abstract class BaseSync
+    public abstract class SchemaSync
     {
-        protected BaseSync()
+        protected SchemaSync()
         {
         }
 
-        protected BaseSync(Guid id) : base() => Id = id;
+        protected SchemaSync(Guid id) : base() => Id = id;
 
         /// <summary>
         /// if datetime is null set value in utc

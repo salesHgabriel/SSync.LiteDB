@@ -17,7 +17,7 @@ namespace SSync.Client.LitebDB.Sync
             _databaseRemoteChanges = JsonSerializer.Deserialize<JsonArray>(databaseRemoteChanges)!;
         }
 
-        public SyncPushBuilder AddPushSchemaSync<T>(Func<SchemaPush<T>, SchemaPush<T>> action, string collectionName) where T : BaseSync
+        public SyncPushBuilder AddPushSchemaSync<T>(Func<SchemaPush<T>, SchemaPush<T>> action, string collectionName) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(action);
 

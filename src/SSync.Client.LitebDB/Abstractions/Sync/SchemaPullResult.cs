@@ -1,6 +1,6 @@
 ﻿namespace SSync.Client.LitebDB.Abstractions.Sync
 {
-    public class SchemaPullResult<T> where T : BaseSync
+    public class SchemaPullResult<T> where T : SchemaSync
     {
         public SchemaPullResult()
         {

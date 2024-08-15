@@ -27,7 +27,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="lastPulledAt"></param>
         /// <param name="collectionName"></param>
         /// <returns></returns>
-        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string collectionName, DateTime now) where T : BaseSync
+        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string collectionName, DateTime now) where T : SchemaSync
         {
             if (_db is null)
             {
@@ -99,7 +99,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="id"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public T FindByIdSync<T>(Guid id, ILiteCollection<T> col) where T : BaseSync
+        public T FindByIdSync<T>(Guid id, ILiteCollection<T> col) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(id);
 
@@ -118,7 +118,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="id"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public T FindByIdSync<T>(Guid id, string? colName) where T : BaseSync
+        public T FindByIdSync<T>(Guid id, string? colName) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(id);
 
@@ -142,7 +142,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        public BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -162,7 +162,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue InsertSync<T>(T entity, string? colName) where T : BaseSync
+        public BsonValue InsertSync<T>(T entity, string? colName) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -186,7 +186,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue UpdateSync<T>(T entity, string? colName) where T : BaseSync
+        public BsonValue UpdateSync<T>(T entity, string? colName) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -209,7 +209,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue UpdateSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        public BsonValue UpdateSync<T>(T entity, ILiteCollection<T> col) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -229,7 +229,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
+        public BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -250,7 +250,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue DeleteSync<T>(T entity, string? colName) where T : BaseSync
+        public BsonValue DeleteSync<T>(T entity, string? colName) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(entity);
 
@@ -272,7 +272,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <typeparam name="T"></typeparam>
         /// <param name="schemaPush"></param>
         /// <returns></returns>
-        public SchemaPush<T> PushChangesResult<T>(SchemaPush<T> schemaPush) where T : BaseSync
+        public SchemaPush<T> PushChangesResult<T>(SchemaPush<T> schemaPush) where T : SchemaSync
         {
             ArgumentNullException.ThrowIfNull(schemaPush);
 

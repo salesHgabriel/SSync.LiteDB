@@ -108,7 +108,7 @@ catch (Exception ex)
 Console.WriteLine("\n\nEnd.");
 Console.ReadKey();
 
-public class User : BaseSync
+public class User : SchemaSync
 {
     public User()
     {
@@ -121,7 +121,7 @@ public class User : BaseSync
     public string Name { get; set; } = string.Empty;
 }
 
-public class Estoque : BaseSync
+public class Estoque : SchemaSync
 {
     public Estoque(Guid id) : base(id)
     {

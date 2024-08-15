@@ -99,7 +99,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             Assert.Equal(expectedUsersDeleted, totalUsersDeleted);
         }
 
-        public class User(Guid id) : BaseSync(id)
+        public class User(Guid id) : SchemaSync(id)
         {
             public string Name { get; set; } = string.Empty;
         }

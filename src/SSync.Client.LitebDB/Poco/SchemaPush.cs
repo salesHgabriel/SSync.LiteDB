@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SSync.Client.LitebDB.Poco
 {
-    public class SchemaPush<T> where T : BaseSync
+    public class SchemaPush<T> where T : SchemaSync
     {
         public string? Collection { get; set; }
         public long Timestamp { get; set; }
