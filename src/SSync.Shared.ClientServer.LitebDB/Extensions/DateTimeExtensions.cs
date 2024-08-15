@@ -31,9 +31,10 @@ namespace SSync.Shared.ClientServer.LitebDB.Extensions
         //    return (long)(utcDateTime - UnixEpoch).TotalSeconds;
         //}
 
-        public static long ToUnixTimestamp(this DateTime dateTime)
+        public static long ToUnixTimestamp(this DateTime dateTime, Time? time = Time.UTC)
         {
-            DateTimeOffset dto = new(dateTime.ToUniversalTime());
+            var utcOrLocal = time == Time.UTC ?  dateTime.ToUniversalTime() : dateTime.ToLocalTime();
+            DateTimeOffset dto = new(utcOrLocal);
             return dto.ToUnixTimeSeconds();
         }
 

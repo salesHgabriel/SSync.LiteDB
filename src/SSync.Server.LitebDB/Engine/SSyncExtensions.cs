@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
@@ -9,9 +10,9 @@ namespace SSync.Server.LitebDB.Engine
 {
     public static class SSyncExtensions
     {
-        public static IServiceCollection AddSSyncSchemaCollection(this IServiceCollection services,
-            Action<IExecutionOrderStep> optionsPullChanges,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+        public static IServiceCollection AddSSyncSchemaCollection<TContext>(this IServiceCollection services,
+            Action<IPullExecutionOrderStep>? optionsPullChanges,
+            Action<IPushExecutionOrderStep>? optionsPushChanges) where TContext : DbContext, ISSyncDbContextTransaction
         {
             services
                 .Scan(scan => scan
@@ -19,9 +20,16 @@ namespace SSync.Server.LitebDB.Engine
                         .AddClasses(classe => classe.AssignableTo(typeof(ISSyncServices)))
                             .AsImplementedInterfaces()
                             .WithScopedLifetime()
+                        .AddClasses(classe => classe.AssignableTo(typeof(IInternalISSyncPushRequest<>)))
+                            .AsImplementedInterfaces()
+                            .WithScopedLifetime()
                        .AddClasses(classe => classe.AssignableTo(typeof(ISSyncPullRequest<,>)))
                             .AsImplementedInterfaces()
-                            .WithScopedLifetime());
+                            .WithScopedLifetime()
+                        .AddClasses(classe => classe.AssignableTo(typeof(ISSyncPushRequest<>)))
+                            .AsImplementedInterfaces()
+                            .WithScopedLifetime()
+                );
 
 
 
@@ -32,15 +40,37 @@ namespace SSync.Server.LitebDB.Engine
 
             //services.AddSingleton(builder);
 
-            services.AddScoped<IExecutionOrderStep, ExecutionOrderBuilder>(sp =>
+            if (optionsPullChanges is not null)
             {
-                var builder = new ExecutionOrderBuilder();
-                optionsPullChanges(builder);
-                return builder;
-            });
+                services.AddScoped<IPullExecutionOrderStep, PullExecutionOrderBuilder>(sp =>
+                {
+                    var builder = new PullExecutionOrderBuilder();
+                    optionsPullChanges(builder);
+                    return builder;
+                });
+            }
+
+            if (optionsPushChanges is not null)
+            {
+                services.AddScoped<IPushExecutionOrderStep, PushExecutionOrderBuilder>(sp =>
+                {
+                    var builder = new PushExecutionOrderBuilder();
+                    optionsPushChanges(builder);
+                    return builder;
+                });
+            }
+
+            services.AddScoped<ISSyncDbContextTransaction>(provider =>
+               provider.GetRequiredService<TContext>()
+               );
 
 
             return services;
+     
         }
+
+
+
     }
+
 }

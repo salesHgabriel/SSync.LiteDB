@@ -1,36 +1,140 @@
-﻿using SSync.Server.LitebDB.Abstractions;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.Extensions.Options;
+using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
+using SSync.Server.LitebDB.Poco;
+using SSync.Shared.ClientServer.LitebDB.Converters;
 using SSync.Shared.ClientServer.LitebDB.Enums;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
+using System.Collections;
+using System.Data;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SSync.Server.LitebDB.Sync
 {
     public class SchemaCollection : ISchemaCollection
     {
         private readonly ISSyncServices _syncServices;
+        private readonly IPullExecutionOrderStep _builder;
+        //TODO: test: USE SINGLETON
+        //private readonly ExecutionOrderStep _builder;
+        private readonly IPushExecutionOrderStep _pushBuilder;
+        private readonly ISSyncDbContextTransaction _sSyncDbContextTransaction;
+        private SSyncOptions? _options = null;
 
-        private readonly IExecutionOrderStep _builder;
-        //private readonly ExecutionOrderStep _builder; // TODO: test: USE SINGLETON 
-
-        public SchemaCollection(ISSyncServices syncServices, IExecutionOrderStep builder)
+        public SchemaCollection(ISSyncServices syncServices,
+            IPullExecutionOrderStep builder, 
+            IPushExecutionOrderStep pushBuilder, 
+            ISSyncDbContextTransaction sSyncDbContextTransaction)
         {
             _syncServices = syncServices;
             _builder = builder;
+            _pushBuilder = pushBuilder;
+            _sSyncDbContextTransaction = sSyncDbContextTransaction;
         }
 
-        private async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter, SSyncOptions? options = null)
-                where TCollection : ISchema
-                where TParamenter : SSyncParamenter
+        public async Task<List<object>> PullChangesAsync(SSyncParamenter parameter, SSyncOptions? options = null)
         {
-            if (paramenter.Colletions.Length == 0) throw new PullChangesException("You need set collections");
+            _options = options;
+            var result = new List<object>();
 
-            if (string.IsNullOrEmpty(paramenter.CurrentColletion)) throw new PullChangesException("Not found collection");
+            
+            Log($"Start pull changes");
+            var steps = _builder.GetSteps();
 
-            var timestamp = options?.TimeConfig == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
+            foreach (var (SyncType, Parameter) in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
+            {
+                parameter.CurrentColletion = Parameter;
+                
+                Log($"Start pull changes of collection {Parameter}");
+
+                MethodInfo? method = typeof(SchemaCollection)!
+                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .MakeGenericMethod(SyncType, parameter.GetType()) ?? throw new PullChangesException("Not found pull request handler");
+
+                var task = (Task)method.Invoke(this, [parameter])!;
+
+                if (task is not null)
+                {
+                    await task.ConfigureAwait(false);
+
+                    var resultProperty = task.GetType().GetProperty("Result");
+
+                    var collectionResult = resultProperty?.GetValue(task);
+
+                    if (collectionResult is not null)
+                    {
+                        result.Add(collectionResult);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParamenter parameter, SSyncOptions? optionsSync = null)
+        {
+
+            _options = optionsSync;
+
+            if (changes == null || changes.Count == 0)
+            {
+                Log("changes is required", consoleColor: ConsoleColor.Red);
+
+                throw new PushChangeException("Changes is array cannot be null or empty.");
+            }
+            try
+            {
+
+                await _sSyncDbContextTransaction.BeginTransactionSyncAsync();
+
+                var schemaChanges = await ExecuteChanges(changes, parameter);
+
+                await _sSyncDbContextTransaction.CommitTransactionSyncAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log($"Push changes not working", consoleColor: ConsoleColor.Red);
+
+                Log(ex, consoleColor: ConsoleColor.Red);
+
+                Log(ex.Message, consoleColor: ConsoleColor.Red);
+
+                Log(ex.InnerException?.Message ?? string.Empty, consoleColor: ConsoleColor.Red);
+
+                await _sSyncDbContextTransaction.RollbackTransactionSyncAsync();
+                throw new PushChangeException(ex.Message);
+            }
+
+        }
+
+        private async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter)
+        where TCollection : ISchema
+        where TParamenter : SSyncParamenter
+        {
+            if (paramenter.Colletions.Length == 0)
+            {
+                Log($"Error collection is required", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("You need set collections");
+            }
+
+            if (string.IsNullOrEmpty(paramenter.CurrentColletion))
+            {
+                Log($"Not found collection {paramenter.CurrentColletion}", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("Not found collection");
+            }
+
+            var timestamp = _options?.TimeConfig == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
 
             var handler = _syncServices.PullRequestHandler<TCollection, TParamenter>();
 
@@ -45,12 +149,16 @@ namespace SSync.Server.LitebDB.Sync
                 var updateds = Enumerable.Empty<TCollection>();
                 var deleteds = new List<Guid>();
 
-                return new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
+                var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
+                
+                Log($"Sucessed pull changes all database");
+
+                return allChanges;
             }
 
-            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp(options?.TimeConfig);
+            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp(_options?.TimeConfig);
 
-            return new SchemaPullResult<TCollection>(
+            var changesOfTime =  new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
                 timestamp.ToUnixTimestamp(),
                 new SchemaPullResult<TCollection>.Change(
@@ -94,42 +202,149 @@ namespace SSync.Server.LitebDB.Sync
                              .ToList()
                     )
                 );
+
+
+            Log($"Sucessed pull changes database of time {lastPulledAt}");
+
+            return changesOfTime;
         }
 
-        public async Task<List<object>> PullChangesAsync(SSyncParamenter parameter, SSyncOptions? options = null)
+        private async Task<long> ExecuteChanges(JsonArray changes, SSyncParamenter parameter)
         {
-            var result = new List<object>();
-
-            var steps = _builder.GetSteps();
-
-            foreach (var step in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
+            try
             {
-                parameter.CurrentColletion = step.Parameter;
+                Log($"Start push changes");
 
-                MethodInfo? method = typeof(SchemaCollection)!
-                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(step.SyncType, parameter.GetType());
+                ArgumentNullException.ThrowIfNull(changes);
 
-                if (method is null) throw new PullChangesException("Not found pull request handler");
+                var schemasSync = _pushBuilder.GetSchemas();
 
-                var task = (Task)method.Invoke(this, new object?[] { parameter, options })!;
+                var collectionOrder = _pushBuilder.GetCollectionOrder();
 
-                if (task is not null)
+                var parseChangesMethod = GetType().GetMethod(nameof(ParseChanges), BindingFlags.Instance | BindingFlags.NonPublic);
+
+                ArgumentNullException.ThrowIfNull(parseChangesMethod);
+
+                var changesMap = new Dictionary<string, SchemaPush<ISchema>>();
+
+                foreach (var changeObj in changes)
                 {
-                    await task.ConfigureAwait(false);
+                    var collectionName = changeObj!["Collection"]?.ToString() ?? changeObj["collection"]?.ToString();
 
-                    var resultProperty = task.GetType().GetProperty("Result");
+                    Log($"Start {collectionName}");
 
-                    var collectionResult = resultProperty?.GetValue(task);
-
-                    if (collectionResult is not null)
+                    if (!string.IsNullOrEmpty(collectionName) && schemasSync.TryGetValue(collectionName, out var schemaType))
                     {
-                        result.Add(collectionResult);
+                        var genericMethodParseChanges = parseChangesMethod.MakeGenericMethod(schemaType);
+
+                        var task = (Task<bool>?)genericMethodParseChanges.Invoke(this, [changeObj, parameter, _options]) ?? throw new PushChangeException("task of method not found");
+
+                        if (!await task)
+                        {
+                            Log($"Error in parse change of collection {collectionName} to type {schemaType.Name}", consoleColor: ConsoleColor.Red);
+
+                            throw new PushChangeException("Not push changes");
+                        }
                     }
+                }
+
+                var currentTime = _options?.TimeConfig == Time.UTC ? DateTime.UtcNow : DateTime.Now;
+                return currentTime.ToUnixTimestamp(_options?.TimeConfig);
+            }
+            catch (Exception ex)
+            {
+                Log($"Error process execute push changes", consoleColor: ConsoleColor.Red);
+
+                Log(ex.Message, consoleColor: ConsoleColor.Red);
+
+                Log(ex.InnerException?.Message ?? string.Empty, consoleColor: ConsoleColor.Red);
+
+                throw new PushChangeException(ex.Message);
+            }
+        }
+
+        private async Task<bool> ParseChanges<TSchema>(JsonNode nodeChange, SSyncParamenter parameter)
+            where TSchema : ISchema
+        {
+            var jsonChange = nodeChange.ToJsonString();
+
+            var schemaPush = JsonSerializer.Deserialize<SchemaPush<TSchema>>(jsonChange, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters =
+                {
+                    new UnixTimeMillisecondsToDateTimeConverter(_options?.TimeConfig)
+                }
+            });
+
+            var result = true;
+
+            if (schemaPush == null || !schemaPush.HasChanges)
+            {
+                result = false;
+                return result;
+            }
+
+            var requestHandler = _syncServices.PushRequestHandler<TSchema>();
+
+            var lastPulledAtSync = parameter.Timestamp.FromUnixTimestamp(_options?.TimeConfig);
+
+            if (schemaPush.Changes.Created.Any())
+            {
+                foreach (var change in schemaPush.Changes.Created)
+                {
+                    if (!await requestHandler.UpsertAsync(change, lastPulledAtSync, _options?.TimeConfig))
+                        result = false;
+                }
+            }
+
+            if (schemaPush.Changes.Updated.Any())
+            {
+                foreach (var change in schemaPush.Changes.Updated)
+                {
+                    if (!await requestHandler.UpsertAsync(change, lastPulledAtSync, _options?.TimeConfig))
+                        result = false;
+                }
+            }
+
+            if (schemaPush.Changes.Deleted.Any())
+            {
+                foreach (var change in schemaPush.Changes.Deleted)
+                {
+                    if (!await requestHandler.DeleteAsync(change, lastPulledAtSync))
+                        result = false;
                 }
             }
 
             return result;
+        }
+
+        private void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Green)
+        {
+            if (_options?.Mode == Mode.DEBUG)
+            {
+                if (_options.SaveLogOnFile)
+                {
+                    using TextWriter w = File.AppendText($"{_options?.PathFile}\\{title}");
+                    w.Write("\r\nLog Entry :");
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    w.WriteLine("  :");
+                    w.WriteLine($"  :{logMessage}");
+                    w.WriteLine("########################################################################");
+                }
+                else
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("\r\nLog Entry :");
+                    msg.AppendLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    msg.AppendLine("  :");
+                    msg.AppendLine($"  :{logMessage}");
+                    msg.AppendLine("########################################################################");
+
+                    Console.ForegroundColor = consoleColor;
+                    Console.WriteLine(msg.ToString());
+                }
+            }
         }
     }
 }

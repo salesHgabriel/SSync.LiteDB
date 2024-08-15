@@ -6,7 +6,8 @@ namespace SSync.Server.LitebDB.Abstractions.Sync
     {
         IServiceProvider ServiceProvider { get; }
 
-        //IInternalWatermelonPushRequest<TRequestCollectionSchema> PushRequestHandler<TRequestCollectionSchema>() where TRequestSchema : ISchema;
+        IInternalISSyncPushRequest<TRequestSchema> PushRequestHandler<TRequestSchema>()
+            where TRequestSchema : ISchema;
 
         ISSyncPullRequest<TRequestCollectionSchema, TParameter> PullRequestHandler<TRequestCollectionSchema, TParameter>()
             where TRequestCollectionSchema : ISchema

@@ -1,7 +1,7 @@
 ﻿using LiteDB;
-using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Sync;
+using SSync.Shared.ClientServer.LitebDB.Enums;
 
 try
 {

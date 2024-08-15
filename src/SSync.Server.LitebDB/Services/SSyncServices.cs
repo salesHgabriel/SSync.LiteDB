@@ -14,9 +14,13 @@ namespace SSync.Server.LitebDB.Services
 
         public IServiceProvider ServiceProvider { get; }
 
+
         public ISSyncPullRequest<TRequestSchema, TParameter> PullRequestHandler<TRequestSchema, TParameter>()
             where TRequestSchema : ISchema
             where TParameter : SSyncParamenter
                 => ServiceProvider.GetRequiredService<ISSyncPullRequest<TRequestSchema, TParameter>>();
+
+        public IInternalISSyncPushRequest<TRequestSchema> PushRequestHandler<TRequestSchema>() where TRequestSchema : ISchema
+            => ServiceProvider.GetRequiredService<IInternalISSyncPushRequest<TRequestSchema>>();
     }
 }

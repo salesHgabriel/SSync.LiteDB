@@ -2,6 +2,7 @@
 using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Poco;
+using SSync.Shared.ClientServer.LitebDB.Enums;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Text;
@@ -330,7 +331,7 @@ namespace SSync.Client.LitebDB.Sync
             return schemaPush;
         }
 
-        public void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
+        public void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Green)
         {
             if (_options?.Mode == Mode.DEBUG && _options.SaveLogOnFile)
             {
@@ -346,7 +347,7 @@ namespace SSync.Client.LitebDB.Sync
             }
         }
 
-        private void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow)
+        private void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Green)
         {
             if (_options?.Mode == Mode.DEBUG)
             {

@@ -3,7 +3,7 @@ namespace SSync.Server.LitebDB.Abstractions
 {
     public abstract class ISchema
     {
-        protected ISchema(Guid id) : base()
+         protected ISchema(Guid id) : base()
         {
             Id = id;
         }
