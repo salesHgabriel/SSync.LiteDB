@@ -32,13 +32,13 @@ namespace SSync.Client.LitebDB.Sync
         {
             if (_db is null)
             {
-                Log($"Database not initialized", consoleColor: ConsoleColor.Red);
+                Log($"Database not initialized");
                 throw new PullChangesException("Database not initialized");
             }
 
             if (lastPulledAt < 0)
             {
-                Log($"Range less of zero", consoleColor: ConsoleColor.Red);
+                Log($"Range less of zero");
 
                 throw new PullChangesException("Range less of zero");
             }
@@ -51,14 +51,21 @@ namespace SSync.Client.LitebDB.Sync
 
             if (doc is null)
             {
-                Log($"Collection not found", consoleColor: ConsoleColor.Red);
+                Log($"Collection not found");
 
                 throw new PullChangesException("Collection not found");
             }
 
-            var createdQuery = doc.Query().Where(d => d.Status == StatusSync.CREATED);
-            var updatedQuery = doc.Query().Where(d => d.Status == StatusSync.UPDATED);
-            var deletedQuery = doc.Query().Where(d => d.Status == StatusSync.DELETED);
+            var createdQuery = doc.Query()
+                .Where(d => d.CreatedAt > 0)
+                .Where(d => d.Status == StatusSync.CREATED);
+
+            var updatedQuery = doc.Query()
+                .Where(d => d.UpdatedAt > 0)
+                .Where(d => d.Status == StatusSync.UPDATED);
+            
+            var deletedQuery = doc.Query()
+                .Where(d => d.Status == StatusSync.DELETED);
 
             if (lastPulledAt == 0)
             {
@@ -294,7 +301,7 @@ namespace SSync.Client.LitebDB.Sync
 
             if (col is null)
             {
-                Log($"Collection not found", consoleColor: ConsoleColor.Red);
+                Log($"Collection not found");
 
                 throw new PushChangeException("Collection not found");
             }
@@ -331,14 +338,12 @@ namespace SSync.Client.LitebDB.Sync
             return schemaPush;
         }
 
-        public void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Green)
+        public void DumpLogOutput(string title = "log.txt")
         {
             if (_options?.Mode == Mode.DEBUG && _options.SaveLogOnFile)
             {
                 using StreamReader r = File.OpenText($"{_options?.PathFile}\\{title}");
                 string? line;
-
-                Console.ForegroundColor = consoleColor;
 
                 while ((line = r.ReadLine()) != null)
                 {
@@ -347,7 +352,7 @@ namespace SSync.Client.LitebDB.Sync
             }
         }
 
-        private void Log(object logMessage, string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Green)
+        private void Log(object logMessage, string title = "log.txt")
         {
             if (_options?.Mode == Mode.DEBUG)
             {
@@ -369,7 +374,6 @@ namespace SSync.Client.LitebDB.Sync
                     msg.AppendLine($"  :{logMessage}");
                     msg.AppendLine("########################################################################");
 
-                    Console.ForegroundColor = consoleColor;
                     Console.WriteLine(msg.ToString());
                 }
             }

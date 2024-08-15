@@ -8,7 +8,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
     {
         BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync;
         BsonValue DeleteSync<T>(T entity, string? colName) where T : BaseSync;
-        void DumpLogOutput(string title = "log.txt", ConsoleColor consoleColor = ConsoleColor.Yellow);
+        void DumpLogOutput(string title = "log.txt");
         T FindByIdSync<T>(Guid id, ILiteCollection<T> col) where T : BaseSync;
         T FindByIdSync<T>(Guid id, string? colName) where T : BaseSync;
         BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync;

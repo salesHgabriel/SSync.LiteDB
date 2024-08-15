@@ -367,7 +367,7 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
     {
         var us = await _db.User.FindAsync(schema.Id);
 
-        us.UpdatedAt = DateTime.Now;
+        us!.UpdatedAt = DateTime.Now;
 
         us.Name = schema.Name;
 
@@ -378,7 +378,7 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
     {
         var us = await _db.User.FindAsync(schema.Id);
 
-        us.DeletedAt = DateTime.Now;
+        us!.DeletedAt = DateTime.Now;
 
         return await _db.SaveChangesAsync() > 0;
     }
