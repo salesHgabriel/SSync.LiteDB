@@ -13,7 +13,5 @@
         public SSyncLiteDBExcepetion(string? message, Exception? innerException) : base(message, innerException)
         {
         }
-
-        
     }
 }

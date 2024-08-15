@@ -15,7 +15,6 @@ namespace SSync.Server.LitebDB.Engine
             _pushRequest = pushRequest;
         }
 
-
         public async Task<bool> UpsertAsync(TSchema schema, DateTime lastPulledAt, Time? time = Time.UTC)
         {
             var existingSchema = await _pushRequest.FindByIdAsync(schema.Id);
@@ -35,7 +34,6 @@ namespace SSync.Server.LitebDB.Engine
             return await _pushRequest.CreateAsync(schema);
         }
 
-   
         public async Task<bool> DeleteAsync(Guid id, DateTime lastPulledAt)
         {
             var existingSchema = await _pushRequest.FindByIdAsync(id);

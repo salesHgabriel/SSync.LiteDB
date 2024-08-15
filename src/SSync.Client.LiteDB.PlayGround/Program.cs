@@ -52,7 +52,6 @@ try
 
     //var user = colUser.FindOne(u => u.Id == Guid.Parse(" id para deletar"));
 
-    
     //user.DeleteAt();
 
     //colUser.Update(user);
@@ -88,11 +87,10 @@ try
     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
 
     //sending update database local changes [databaseLocal]
-    //post api/push  
-
+    //post api/push
 
     //simute server changes
-    //api/pull 
+    //api/pull
     //string responseServer = await File.ReadAllTextAsync(dirApp + "ResponseServer.json");
 
     //var pushBuilder = new SyncPushBuilder(responseServer);

@@ -204,7 +204,6 @@ internal class TestDbContext : DbContext, ISSyncDbContextTransaction
     public DbSet<User> User => Set<User>();
     public DbSet<Finance> Finances => Set<Finance>();
 
-
     public async Task BeginTransactionSyncAsync()
         => transaction = await Database.BeginTransactionAsync();
 
@@ -223,7 +222,6 @@ internal class TestDbContext : DbContext, ISSyncDbContextTransaction
         ArgumentNullException.ThrowIfNull(transaction);
         return transaction.RollbackAsync();
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

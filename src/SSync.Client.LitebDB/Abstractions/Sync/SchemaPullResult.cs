@@ -4,8 +4,8 @@
     {
         public SchemaPullResult()
         {
-
         }
+
         public SchemaPullResult(string? collection, long timestamp, Change changesModel)
         {
             Collection = collection;

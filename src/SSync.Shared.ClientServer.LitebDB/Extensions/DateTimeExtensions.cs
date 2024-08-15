@@ -1,5 +1,4 @@
-﻿
-using SSync.Shared.ClientServer.LitebDB.Enums;
+﻿using SSync.Shared.ClientServer.LitebDB.Enums;
 
 namespace SSync.Shared.ClientServer.LitebDB.Extensions
 {
@@ -33,7 +32,7 @@ namespace SSync.Shared.ClientServer.LitebDB.Extensions
 
         public static long ToUnixTimestamp(this DateTime dateTime, Time? time = Time.UTC)
         {
-            var utcOrLocal = time == Time.UTC ?  dateTime.ToUniversalTime() : dateTime.ToLocalTime();
+            var utcOrLocal = time == Time.UTC ? dateTime.ToUniversalTime() : dateTime.ToLocalTime();
             DateTimeOffset dto = new(utcOrLocal);
             return dto.ToUnixTimeSeconds();
         }

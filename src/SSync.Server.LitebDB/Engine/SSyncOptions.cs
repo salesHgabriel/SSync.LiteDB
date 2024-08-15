@@ -1,11 +1,9 @@
-﻿
-using SSync.Shared.ClientServer.LitebDB.Enums;
+﻿using SSync.Shared.ClientServer.LitebDB.Enums;
 
 namespace SSync.Server.LitebDB.Engine
 {
     public class SSyncOptions
     {
-
         /// <summary>
         /// Configure your timestamp
         /// IMPORTANT: Required same your client

@@ -1,5 +1,4 @@
-﻿
-namespace SSync.Shared.ClientServer.LitebDB.Enums
+﻿namespace SSync.Shared.ClientServer.LitebDB.Enums
 {
     public enum Mode
     {

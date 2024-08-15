@@ -1,5 +1,4 @@
 ﻿using LiteDB;
-using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Poco;
 using SSync.Shared.ClientServer.LitebDB.Enums;
@@ -63,7 +62,7 @@ namespace SSync.Client.LitebDB.Sync
             var updatedQuery = doc.Query()
                 .Where(d => d.UpdatedAt > 0)
                 .Where(d => d.Status == StatusSync.UPDATED);
-            
+
             var deletedQuery = doc.Query()
                 .Where(d => d.Status == StatusSync.DELETED);
 
@@ -111,7 +110,6 @@ namespace SSync.Client.LitebDB.Sync
             return col.FindById(id);
         }
 
-
         /// <summary>
         /// Wrapper to use search collection from id
         /// Search collection from by name, if not set search for default name of class
@@ -147,16 +145,14 @@ namespace SSync.Client.LitebDB.Sync
         public BsonValue InsertSync<T>(T entity, ILiteCollection<T> col) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(entity);
-            
-            ArgumentNullException.ThrowIfNull(col);
 
+            ArgumentNullException.ThrowIfNull(col);
 
             Log("Insert row");
             entity.CreateAt();
 
             return col.Insert(entity);
         }
-
 
         /// <summary>
         /// this abstraction focus set automatically set date on property createdAt
@@ -176,14 +172,11 @@ namespace SSync.Client.LitebDB.Sync
 
             if (col is null) ArgumentNullException.ThrowIfNull(col);
 
-
-
             Log("Insert row");
             entity.CreateAt();
 
             return col.Insert(entity);
         }
-
 
         /// <summary>
         /// this abstraction focus set automatically set date on property updatedAt
@@ -222,13 +215,11 @@ namespace SSync.Client.LitebDB.Sync
 
             ArgumentNullException.ThrowIfNull(col);
 
-
             Log("update row");
             entity.UpdateAt();
 
             return col.Update(entity);
         }
-
 
         /// <summary>
         /// this abstraction focus set automatically set date on property deletedAt
@@ -244,13 +235,11 @@ namespace SSync.Client.LitebDB.Sync
 
             ArgumentNullException.ThrowIfNull(col);
 
-
             Log("delete row");
             entity.DeleteAt();
 
             return col.Update(entity);
         }
-
 
         /// <summary>
         /// this abstraction focus set automatically set date on property deletedAt
@@ -270,7 +259,6 @@ namespace SSync.Client.LitebDB.Sync
             var col = _db.GetCollection<T>(colName);
 
             if (col is null) ArgumentNullException.ThrowIfNull(col);
-
 
             Log("delete row");
             entity.DeleteAt();

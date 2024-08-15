@@ -2,7 +2,6 @@
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
 
-
 namespace SSync.Server.LitebDB.Engine.Builders
 {
     public class PullExecutionOrderBuilder : IPullExecutionOrderStep
@@ -23,7 +22,6 @@ namespace SSync.Server.LitebDB.Engine.Builders
 
         public List<(Type SyncType, string Parameter)> GetSteps() => _steps;
 
-
         public async Task ExecuteAsync<TParameter>(TParameter parameter, string[] filter)
             where TParameter : SSyncParamenter
         {
@@ -42,6 +40,4 @@ namespace SSync.Server.LitebDB.Engine.Builders
             }
         }
     }
-
-
 }

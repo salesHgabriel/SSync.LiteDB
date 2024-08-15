@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using Microsoft.Extensions.Options;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
@@ -9,7 +8,6 @@ using SSync.Shared.ClientServer.LitebDB.Converters;
 using SSync.Shared.ClientServer.LitebDB.Enums;
 using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
-using System.Collections;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -22,15 +20,17 @@ namespace SSync.Server.LitebDB.Sync
     {
         private readonly ISSyncServices _syncServices;
         private readonly IPullExecutionOrderStep _builder;
+
         //TODO: test: USE SINGLETON
         //private readonly ExecutionOrderStep _builder;
         private readonly IPushExecutionOrderStep _pushBuilder;
+
         private readonly ISSyncDbContextTransaction _sSyncDbContextTransaction;
         private SSyncOptions? _options = null;
 
         public SchemaCollection(ISSyncServices syncServices,
-            IPullExecutionOrderStep builder, 
-            IPushExecutionOrderStep pushBuilder, 
+            IPullExecutionOrderStep builder,
+            IPushExecutionOrderStep pushBuilder,
             ISSyncDbContextTransaction sSyncDbContextTransaction)
         {
             _syncServices = syncServices;
@@ -44,14 +44,13 @@ namespace SSync.Server.LitebDB.Sync
             _options = options;
             var result = new List<object>();
 
-            
             Log($"Start pull changes");
             var steps = _builder.GetSteps();
 
             foreach (var (SyncType, Parameter) in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
             {
                 parameter.CurrentColletion = Parameter;
-                
+
                 Log($"Start pull changes of collection {Parameter}");
 
                 MethodInfo? method = typeof(SchemaCollection)!
@@ -80,7 +79,6 @@ namespace SSync.Server.LitebDB.Sync
 
         public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParamenter parameter, SSyncOptions? optionsSync = null)
         {
-
             _options = optionsSync;
 
             if (changes == null || changes.Count == 0)
@@ -91,18 +89,15 @@ namespace SSync.Server.LitebDB.Sync
             }
             try
             {
-
                 await _sSyncDbContextTransaction.BeginTransactionSyncAsync();
 
                 Log("Open Transaction database");
-
 
                 var schemaChanges = await ExecuteChanges(changes, parameter);
 
                 await _sSyncDbContextTransaction.CommitTransactionSyncAsync();
 
                 Log("Commit Transaction database");
-
 
                 return true;
             }
@@ -119,7 +114,6 @@ namespace SSync.Server.LitebDB.Sync
                 await _sSyncDbContextTransaction.RollbackTransactionSyncAsync();
                 throw new PushChangeException(ex.Message);
             }
-
         }
 
         private async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter)
@@ -156,7 +150,7 @@ namespace SSync.Server.LitebDB.Sync
                 var deleteds = new List<Guid>();
 
                 var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
-                
+
                 Log($"Sucessed pull changes all database");
 
                 return allChanges;
@@ -164,7 +158,7 @@ namespace SSync.Server.LitebDB.Sync
 
             DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp(_options?.TimeConfig);
 
-            var changesOfTime =  new SchemaPullResult<TCollection>(
+            var changesOfTime = new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
                 timestamp.ToUnixTimestamp(),
                 new SchemaPullResult<TCollection>.Change(
@@ -208,7 +202,6 @@ namespace SSync.Server.LitebDB.Sync
                              .ToList()
                     )
                 );
-
 
             Log($"Sucessed pull changes database of time {lastPulledAt}");
 

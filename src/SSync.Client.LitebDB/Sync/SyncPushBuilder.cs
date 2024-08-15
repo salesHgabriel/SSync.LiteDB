@@ -20,7 +20,7 @@ namespace SSync.Client.LitebDB.Sync
         public SyncPushBuilder AddPushSchemaSync<T>(Func<SchemaPush<T>, SchemaPush<T>> action, string collectionName) where T : BaseSync
         {
             ArgumentNullException.ThrowIfNull(action);
-            
+
             string propertyCol = nameof(SchemaPush<T>.Collection);
 
             var filteredNode = _databaseRemoteChanges.First(node => node![propertyCol]?.ToString() == collectionName)!;

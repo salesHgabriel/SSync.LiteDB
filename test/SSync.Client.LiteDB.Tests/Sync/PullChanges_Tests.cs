@@ -64,7 +64,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
         [Fact]
         public void InsertAndUpdatedAndDeleteRowsSync_ShouldReturnPullChangesWithSameMethods()
         {
-       
             var colUserName = "user";
 
             var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
@@ -78,9 +77,9 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             foreach (var us in users)
             {
-                sync.InsertSync(us,colUserName);
+                sync.InsertSync(us, colUserName);
             }
-            
+
             sync.UpdateSync(users[0], colUserName);
 
             sync.DeleteSync(users[3], colUserName);
@@ -94,7 +93,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var totalUsersCreated = changes.Changes.Created.Count();
             var totalUsersUpdated = changes.Changes.Updated.Count();
             var totalUsersDeleted = changes.Changes.Deleted.Count();
-
 
             Assert.Equal(expectedUsersCreated, totalUsersCreated);
             Assert.Equal(expectedUsersUpdated, totalUsersUpdated);

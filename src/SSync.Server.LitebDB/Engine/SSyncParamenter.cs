@@ -9,6 +9,5 @@ namespace SSync.Server.LitebDB.Engine
 
         [JsonIgnore]
         internal string CurrentColletion { get; set; } = string.Empty;
-
     }
 }

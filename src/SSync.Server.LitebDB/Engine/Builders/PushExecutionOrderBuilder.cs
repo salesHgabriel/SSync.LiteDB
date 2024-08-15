@@ -1,6 +1,5 @@
-﻿using SSync.Server.LitebDB.Abstractions.Builders;
-using SSync.Server.LitebDB.Abstractions;
-
+﻿using SSync.Server.LitebDB.Abstractions;
+using SSync.Server.LitebDB.Abstractions.Builders;
 
 namespace SSync.Server.LitebDB.Engine.Builders
 {
@@ -22,7 +21,6 @@ namespace SSync.Server.LitebDB.Engine.Builders
             _schemas[collectionName] = typeof(T);
             return this;
         }
-
 
         public List<string> GetCollectionOrder()
         {

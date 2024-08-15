@@ -1,5 +1,4 @@
-﻿
-namespace SSync.Server.LitebDB.Abstractions.Sync
+﻿namespace SSync.Server.LitebDB.Abstractions.Sync
 {
     public interface ISSyncPushRequest<TSchema> where TSchema : ISchema
     {

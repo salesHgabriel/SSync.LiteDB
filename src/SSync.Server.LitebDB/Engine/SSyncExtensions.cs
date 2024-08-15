@@ -31,8 +31,6 @@ namespace SSync.Server.LitebDB.Engine
                             .WithScopedLifetime()
                 );
 
-
-
             services.AddScoped<ISchemaCollection, SchemaCollection>();
 
             //var builder = new ExecutionOrderBuilder();
@@ -64,13 +62,7 @@ namespace SSync.Server.LitebDB.Engine
                provider.GetRequiredService<TContext>()
                );
 
-
             return services;
-     
         }
-
-
-
     }
-
 }

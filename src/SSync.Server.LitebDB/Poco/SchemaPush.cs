@@ -27,8 +27,8 @@ namespace SSync.Server.LitebDB.Poco
         {
             public Change()
             {
-                
             }
+
             public Change(IEnumerable<T> created, IEnumerable<T> updated, IEnumerable<Guid> deleted)
             {
                 Created = created;
@@ -40,7 +40,7 @@ namespace SSync.Server.LitebDB.Poco
             public IEnumerable<T> Updated { get; set; } = default!;
             public IEnumerable<Guid> Deleted { get; set; } = default!;
         }
-        public void SetCommitDatabaseOperation(bool succeced) => CommitedDatabaseOperation = succeced;
 
+        public void SetCommitDatabaseOperation(bool succeced) => CommitedDatabaseOperation = succeced;
     }
 }

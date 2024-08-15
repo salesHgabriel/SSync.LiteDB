@@ -7,8 +7,8 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
     {
         protected BaseSync()
         {
-
         }
+
         protected BaseSync(Guid id) : base() => Id = id;
 
         /// <summary>
@@ -30,7 +30,6 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
             UpdatedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
             Status = StatusSync.UPDATED;
         }
-
 
         /// <summary>
         /// if datetime is null set value in utc
