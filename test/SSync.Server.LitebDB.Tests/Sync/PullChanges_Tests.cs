@@ -12,7 +12,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
     {
 
         [Fact]
-        public async void NoSetupChanges_SchoudReturnNull()
+        public async Task NoSetupChanges_SchoudReturnNull()
         {
             var parameter = new SSyncParamenter()
             {
@@ -28,7 +28,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
         }
 
         [Fact]
-        public async void SetNoneCollection_SchoudReturnPullChangesException()
+        public async Task SetNoneCollection_SchoudReturnPullChangesException()
         {
             var parameter = new SSyncParamenter()
             {
@@ -45,16 +45,16 @@ namespace SSync.Server.LitebDB.Tests.Sync
 
             var shemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutationMock.Object, pushExecutationMock.Object, syncDbContextTransactionMock.Object);
 
-            var act = async () => await shemaCollection.PullChangesAsync(parameter);
+            async Task<List<object>> act() => await shemaCollection.PullChangesAsync(parameter);
 
-            PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>(act);
+            PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>((Func<Task<List<object>>>)act);
 
             Assert.Equal("You need set collections", exception.Message);
         }
 
 
         [Fact]
-        public async void SetTimeStampLessThanZero_SchoudReturnPullChangesException()
+        public async Task SetTimeStampLessThanZero_SchoudReturnPullChangesException()
         {
             var parameter = new SSyncParamenter()
             {
@@ -71,9 +71,9 @@ namespace SSync.Server.LitebDB.Tests.Sync
 
             var shemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutationMock.Object, pushExecutationMock.Object, syncDbContextTransactionMock.Object);
 
-            var act = async () => await shemaCollection.PullChangesAsync(parameter);
+            async Task<List<object>> act() => await shemaCollection.PullChangesAsync(parameter);
 
-            PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>(act);
+            PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>((Func<Task<List<object>>>)act);
 
             Assert.Equal("Timestamp should be zero or more", exception.Message);
         }
@@ -89,12 +89,8 @@ namespace SSync.Server.LitebDB.Tests.Sync
 
 
 
-    public class UserSync : ISchema
+    public class UserSync(Guid id) : ISchema(id)
     {
-        public UserSync(Guid id) : base(id)
-        {
-        }
-
         public string? Name { get; set; }
     }
 }
