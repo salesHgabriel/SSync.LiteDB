@@ -21,14 +21,14 @@ namespace SSync.Server.LitebDB.Tests.Sync
             };
 
             var schemaMock = new Mock<ISchemaCollection>();
-            
+
             var itens = await schemaMock.Object.PullChangesAsync(parameter);
-           
+
             Assert.Null(itens);
         }
 
         [Fact]
-        public async Task SetNoneCollection_SchoudReturnPullChangesException()
+        public async Task SetNoneCollection_ShouldReturnPullChangesException()
         {
             var parameter = new SSyncParamenter()
             {
@@ -37,15 +37,15 @@ namespace SSync.Server.LitebDB.Tests.Sync
             };
 
             var syncServiceMock = new Mock<ISSyncServices>();
-            var pullExecutationMock = new Mock<IPullExecutionOrderStep>();
-            var pushExecutationMock = new Mock<IPushExecutionOrderStep>();
+            var pullExecutionMock = new Mock<IPullExecutionOrderStep>();
+            var pushExecutionMock = new Mock<IPushExecutionOrderStep>();
             var syncDbContextTransactionMock = new Mock<ISSyncDbContextTransaction>();
 
-            pullExecutationMock.Setup(s => s.By<UserSync>("user"));
+            pullExecutionMock.Setup(s => s.By<UserSync>("user"));
 
-            var shemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutationMock.Object, pushExecutationMock.Object, syncDbContextTransactionMock.Object);
+            var schemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutionMock.Object, pushExecutionMock.Object, syncDbContextTransactionMock.Object);
 
-            async Task<List<object>> act() => await shemaCollection.PullChangesAsync(parameter);
+            async Task<List<object>> act() => await schemaCollection.PullChangesAsync(parameter);
 
             PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>((Func<Task<List<object>>>)act);
 
@@ -54,7 +54,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
 
 
         [Fact]
-        public async Task SetTimeStampLessThanZero_SchoudReturnPullChangesException()
+        public async Task SetTimeStampLessThanZero_ShouldReturnPullChangesException()
         {
             var parameter = new SSyncParamenter()
             {
@@ -63,29 +63,56 @@ namespace SSync.Server.LitebDB.Tests.Sync
             };
 
             var syncServiceMock = new Mock<ISSyncServices>();
-            var pullExecutationMock = new Mock<IPullExecutionOrderStep>();
-            var pushExecutationMock = new Mock<IPushExecutionOrderStep>();
+            var pullExecutionMock = new Mock<IPullExecutionOrderStep>();
+            var pushExecutionMock = new Mock<IPushExecutionOrderStep>();
             var syncDbContextTransactionMock = new Mock<ISSyncDbContextTransaction>();
 
-            pullExecutationMock.Setup(s => s.By<UserSync>("user"));
+            pullExecutionMock.Setup(s => s.By<UserSync>("user"));
 
-            var shemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutationMock.Object, pushExecutationMock.Object, syncDbContextTransactionMock.Object);
+            var schemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutionMock.Object, pushExecutionMock.Object, syncDbContextTransactionMock.Object);
 
-            async Task<List<object>> act() => await shemaCollection.PullChangesAsync(parameter);
+            async Task<List<object>> act() => await schemaCollection.PullChangesAsync(parameter);
 
             PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>((Func<Task<List<object>>>)act);
 
             Assert.Equal("Timestamp should be zero or more", exception.Message);
         }
+
+        //TODO: FINISH THIS TEST
+
+        [Fact]
+        public async Task SetTimeStampEqualZero_ShouldReturnPullChangesOnlyCreated()
+        {
+            var parameter = new SSyncParamenter()
+            {
+                Colletions = ["User"],
+                Timestamp = 0
+            };
+
+            var syncServiceMock = new Mock<ISSyncServices>();
+            var pullExecutionMock= new Mock<IPullExecutionOrderStep>();
+            var pushExecutionMock = new Mock<IPushExecutionOrderStep>();
+            var syncDbContextTransactionMock = new Mock<ISSyncDbContextTransaction>();
+
+            //create setup memory database
+            //insert rows
+            //update this rows
+
+            pullExecutionMock.Setup(s => s.By<UserSync>("user"));
+
+            var schemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutionMock.Object, pushExecutionMock.Object, syncDbContextTransactionMock.Object);
+
+            var changes = await schemaCollection.PullChangesAsync(parameter);
+
+            //should return only created rows
+
+        }
+
+
+        //TODO: CREATE TEST CHECK TIMESTAMP AND RETURN CHANGE CREATE OR UPDATE OR DELETE
+
     }
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -93,4 +120,4 @@ namespace SSync.Server.LitebDB.Tests.Sync
     {
         public string? Name { get; set; }
     }
-}
+
