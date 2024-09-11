@@ -257,7 +257,7 @@ internal class Finance
     public DateTime? DeletedAt { get; set; }
 }
 
-internal class PlayParamenter : SSyncParamenter
+internal class PlayParamenter : SSyncParameter
 {
     public int Time { get; set; } = new Random().Next(100);
 }
@@ -280,11 +280,11 @@ internal class FinanceSync : ISchema
     public double Price { get; set; }
 }
 
-internal class PullUserRequesHandler : ISSyncPullRequest<UserSync, PlayParamenter>
+internal class PullUserRequestHandler : ISSyncPullRequest<UserSync, PlayParamenter>
 {
     private readonly TestDbContext _ctx;
 
-    public PullUserRequesHandler(TestDbContext ctx)
+    public PullUserRequestHandler(TestDbContext ctx)
     {
         _ctx = ctx;
     }
@@ -303,11 +303,11 @@ internal class PullUserRequesHandler : ISSyncPullRequest<UserSync, PlayParamente
     }
 }
 
-internal class PullFinanceRequesHandler : ISSyncPullRequest<FinanceSync, PlayParamenter>
+internal class PullFinanceRequestHandler : ISSyncPullRequest<FinanceSync, PlayParamenter>
 {
     private readonly TestDbContext _ctx;
 
-    public PullFinanceRequesHandler(TestDbContext ctx)
+    public PullFinanceRequestHandler(TestDbContext ctx)
     {
         _ctx = ctx;
     }

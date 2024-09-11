@@ -11,6 +11,6 @@ namespace SSync.Server.LitebDB.Abstractions.Sync
 
         ISSyncPullRequest<TRequestCollectionSchema, TParameter> PullRequestHandler<TRequestCollectionSchema, TParameter>()
             where TRequestCollectionSchema : ISchema
-            where TParameter : SSyncParamenter;
+            where TParameter : SSyncParameter;
     }
 }

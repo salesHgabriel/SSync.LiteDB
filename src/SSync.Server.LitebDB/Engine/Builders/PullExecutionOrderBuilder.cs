@@ -23,7 +23,7 @@ namespace SSync.Server.LitebDB.Engine.Builders
         public List<(Type SyncType, string Parameter)> GetSteps() => _steps;
 
         public async Task ExecuteAsync<TParameter>(TParameter parameter, string[] filter)
-            where TParameter : SSyncParamenter
+            where TParameter : SSyncParameter
         {
             var steps = GetSteps();
             foreach (var (SyncType, Parameter) in steps)

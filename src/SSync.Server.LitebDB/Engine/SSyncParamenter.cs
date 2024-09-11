@@ -2,7 +2,7 @@
 
 namespace SSync.Server.LitebDB.Engine
 {
-    public class SSyncParamenter
+    public class SSyncParameter
     {
         public string[] Colletions { get; set; } = [];
         public long Timestamp { get; set; } = 0;

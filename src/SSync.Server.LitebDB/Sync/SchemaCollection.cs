@@ -40,7 +40,7 @@ namespace SSync.Server.LitebDB.Sync
             _sSyncDbContextTransaction = sSyncDbContextTransaction;
         }
 
-        public async Task<List<object>> PullChangesAsync(SSyncParamenter parameter, SSyncOptions? options = null)
+        public async Task<List<object>> PullChangesAsync(SSyncParameter parameter, SSyncOptions? options = null)
         {
             if (parameter.Colletions.Length == 0)
             {
@@ -93,7 +93,7 @@ namespace SSync.Server.LitebDB.Sync
             return result;
         }
 
-        public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParamenter parameter, SSyncOptions? optionsSync = null)
+        public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
         {
             _options = optionsSync;
 
@@ -134,7 +134,7 @@ namespace SSync.Server.LitebDB.Sync
 
         private async Task<SchemaPullResult<TCollection>> CheckChanges<TCollection, TParamenter>(TParamenter paramenter)
         where TCollection : ISchema
-        where TParamenter : SSyncParamenter
+        where TParamenter : SSyncParameter
         {
             if (paramenter.Colletions.Length == 0)
             {
@@ -224,7 +224,7 @@ namespace SSync.Server.LitebDB.Sync
             return changesOfTime;
         }
 
-        private async Task<long> ExecuteChanges(JsonArray changes, SSyncParamenter parameter)
+        private async Task<long> ExecuteChanges(JsonArray changes, SSyncParameter parameter)
         {
             try
             {
@@ -278,7 +278,7 @@ namespace SSync.Server.LitebDB.Sync
             }
         }
 
-        private async Task<bool> ParseChanges<TSchema>(JsonNode nodeChange, SSyncParamenter parameter)
+        private async Task<bool> ParseChanges<TSchema>(JsonNode nodeChange, SSyncParameter parameter)
             where TSchema : ISchema
         {
             var jsonChange = nodeChange.ToJsonString();
