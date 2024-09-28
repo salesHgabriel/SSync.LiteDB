@@ -10,7 +10,6 @@ using SSync.Shared.ClientServer.LitebDB.Exceptions;
 using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Data;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -63,29 +62,32 @@ namespace SSync.Server.LitebDB.Sync
             Log($"Start pull changes");
             var steps = _builder.GetSteps();
 
-            foreach (var (SyncType, Parameter) in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
+            if (steps is not null)
             {
-                parameter.CurrentColletion = Parameter;
-
-                Log($"Start pull changes of collection {Parameter}");
-
-                MethodInfo? method = typeof(SchemaCollection)!
-                    .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(SyncType, parameter.GetType()) ?? throw new PullChangesException("Not found pull request handler");
-
-                var task = (Task)method.Invoke(this, [parameter])!;
-
-                if (task is not null)
+                foreach (var (SyncType, Parameter) in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
                 {
-                    await task.ConfigureAwait(false);
+                    parameter.CurrentColletion = Parameter;
 
-                    var resultProperty = task.GetType().GetProperty("Result");
+                    Log($"Start pull changes of collection {Parameter}");
 
-                    var collectionResult = resultProperty?.GetValue(task);
+                    MethodInfo? method = typeof(SchemaCollection)!
+                        .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
+                        .MakeGenericMethod(SyncType, parameter.GetType()) ?? throw new PullChangesException("Not found pull request handler");
 
-                    if (collectionResult is not null)
+                    var task = (Task)method.Invoke(this, [parameter])!;
+
+                    if (task is not null)
                     {
-                        result.Add(collectionResult);
+                        await task.ConfigureAwait(false);
+
+                        var resultProperty = task.GetType().GetProperty("Result");
+
+                        var collectionResult = resultProperty?.GetValue(task);
+
+                        if (collectionResult is not null)
+                        {
+                            result.Add(collectionResult);
+                        }
                     }
                 }
             }
