@@ -34,7 +34,7 @@ jobs:
 
         - name: Pack Client
           run: |
-            dotnet pack ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj -c Release -o .output-client
+            dotnet pack ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj -c Release -o output-client
 
 
         - name: Publish Client to Nuget.Org    
@@ -62,7 +62,7 @@ jobs:
 
         - name: Pack Server
           run: |
-            dotnet pack ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj -c Release -o .output-server
+            dotnet pack ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj -c Release -o output-server
 
 
         - name: Publish Server to Nuget.Org
