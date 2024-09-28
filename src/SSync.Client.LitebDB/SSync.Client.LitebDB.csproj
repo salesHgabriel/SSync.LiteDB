@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 
 		<PackageId>SSync.Client.LitebDB</PackageId>
-		<Version>1.0.0-alpha.1</Version>
+		<Version>{{Version}}</Version>
 		<Authors>Gabriel Sales</Authors>
 		<Copyright>MIT</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
