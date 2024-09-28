@@ -4,6 +4,18 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+
+
+	  <PackageId>SSync.Server.LitebDB</PackageId>
+	  <Version>1.0.0-alpha.1</Version>
+	  <Authors>Gabriel Sales</Authors>
+	  <Copyright>MIT</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageTags>database nosql embedded sync api web api</PackageTags>
+	  <Title>SSync Server LitebDB</Title>
+
+
   </PropertyGroup>
 
   <ItemGroup>

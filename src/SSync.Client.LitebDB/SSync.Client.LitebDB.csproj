@@ -5,8 +5,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
+		<PackageId>SSync.Client.LitebDB</PackageId>
+		<Version>1.0.0-alpha.1</Version>
 		<Authors>Gabriel Sales</Authors>
 		<Copyright>MIT</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageTags>database nosql embedded sync api web api</PackageTags>
+		<Title>SSync Client LitebDB</Title>
+
 
 	</PropertyGroup>
 
