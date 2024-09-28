@@ -6,7 +6,7 @@ on:
         - '*.*.**'
 jobs:
   publish_nuget_package:
-    name: Publish SSync Client
+    name: Publish SSync
     runs-on: ubuntu-latest
     steps:
     
@@ -20,7 +20,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set Version Client
           run: |
-            set -i -e 's/{{Version}}/${{github.ref_name}}/' ./src.SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src.SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
         - name: Restore Client
           run: dotnet restore ./src.SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
@@ -50,7 +50,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set Version Server
           run: |
-            set -i -e 's/{{Version}}/${{github.ref_name}}/' ./src.SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src.SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
         - name: Restore Server
           run: dotnet restore ./src.SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
