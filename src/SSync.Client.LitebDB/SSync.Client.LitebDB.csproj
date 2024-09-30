@@ -12,6 +12,10 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageTags>database nosql embedded sync api web api</PackageTags>
 		<Title>SSync Client LitebDB</Title>
+		<RepositoryUrl>https://github.com/salesHgabriel/SSync.LiteDB</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/salesHgabriel/SSync.LiteDB</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageIcon>sync-client.png</PackageIcon>
 
 
 	</PropertyGroup>
