@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
-using SSync.Shared.ClientServer.LitebDB.Enums;
+using SSync.Server.LitebDB.Enums;
 using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);

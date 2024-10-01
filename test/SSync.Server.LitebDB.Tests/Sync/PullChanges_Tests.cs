@@ -3,8 +3,9 @@ using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
+using SSync.Server.LitebDB.Exceptions;
 using SSync.Server.LitebDB.Sync;
-using SSync.Shared.ClientServer.LitebDB.Exceptions;
+
 
 namespace SSync.Server.LitebDB.Tests.Sync
 {

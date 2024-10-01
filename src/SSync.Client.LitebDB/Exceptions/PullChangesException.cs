@@ -1,4 +1,4 @@
-﻿namespace SSync.Shared.ClientServer.LitebDB.Exceptions
+﻿namespace SSync.Client.LitebDB.Exceptions
 {
     public class PullChangesException : Exception
     {

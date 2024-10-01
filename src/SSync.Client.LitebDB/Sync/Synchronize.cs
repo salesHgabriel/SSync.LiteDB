@@ -1,9 +1,9 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions.Sync;
+using SSync.Client.LitebDB.Enums;
+using SSync.Client.LitebDB.Exceptions;
+using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Poco;
-using SSync.Shared.ClientServer.LitebDB.Enums;
-using SSync.Shared.ClientServer.LitebDB.Exceptions;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
 using System.Text;
 
 namespace SSync.Client.LitebDB.Sync

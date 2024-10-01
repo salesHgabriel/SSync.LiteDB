@@ -1,6 +1,7 @@
-﻿using SSync.Shared.ClientServer.LitebDB.Enums;
+﻿
+using SSync.Client.LitebDB.Enums;
 
-namespace SSync.Shared.ClientServer.LitebDB.Extensions
+namespace SSync.Client.LitebDB.Extensions
 {
     public static class DateTimeExtensions
     {

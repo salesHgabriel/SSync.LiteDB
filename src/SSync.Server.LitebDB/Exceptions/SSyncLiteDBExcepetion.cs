@@ -1,4 +1,4 @@
-﻿namespace SSync.Shared.ClientServer.LitebDB.Exceptions
+﻿namespace SSync.Server.LitebDB.Exceptions
 {
     public class SSyncLiteDBExcepetion : Exception
     {

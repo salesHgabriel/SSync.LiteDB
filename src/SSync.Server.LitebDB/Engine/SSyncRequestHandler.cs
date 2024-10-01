@@ -1,8 +1,8 @@
 ﻿using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
-using SSync.Shared.ClientServer.LitebDB.Enums;
-using SSync.Shared.ClientServer.LitebDB.Exceptions;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
+using SSync.Server.LitebDB.Enums;
+using SSync.Server.LitebDB.Exceptions;
+using SSync.Server.LitebDB.Extensions;
 
 namespace SSync.Server.LitebDB.Engine
 {

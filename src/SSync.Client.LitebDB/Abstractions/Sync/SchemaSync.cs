@@ -1,5 +1,5 @@
 ﻿using LiteDB;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
+using SSync.Client.LitebDB.Extensions;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
 {

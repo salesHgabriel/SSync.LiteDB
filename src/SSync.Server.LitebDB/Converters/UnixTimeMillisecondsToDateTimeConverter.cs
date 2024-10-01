@@ -1,9 +1,9 @@
-﻿using SSync.Shared.ClientServer.LitebDB.Enums;
-using SSync.Shared.ClientServer.LitebDB.Extensions;
+﻿using SSync.Server.LitebDB.Enums;
+using SSync.Server.LitebDB.Extensions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SSync.Shared.ClientServer.LitebDB.Converters
+namespace SSync.Server.LitebDB.Converters
 {
     public class UnixTimeMillisecondsToDateTimeConverter : JsonConverter<DateTime>
     {
