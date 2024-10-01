@@ -7,7 +7,7 @@
 
 
 	  <PackageId>SSync.Shared.ClientServer.LitebDB</PackageId>
-	  <Version>{{Version}}</Version>
+	  <Version>1.1.1</Version>
 	  <Authors>Gabriel Sales</Authors>
 	  <Copyright>MIT</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>

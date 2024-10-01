@@ -20,7 +20,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set Version Client
           run: |
-            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+            sed -i -e 's/1.1.1/${{github.ref_name}}/' ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
         - name: Restore Client
           run: dotnet restore ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
@@ -48,7 +48,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set Version Server
           run: |
-            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+            sed -i -e 's/1.1.1/${{github.ref_name}}/' ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
         - name: Restore Server
           run: dotnet restore ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
@@ -78,7 +78,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set Version Client
           run: |
-            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src/SSync.Shared.ClientServer.LitebDB
+            sed -i -e 's/1.1.1/${{github.ref_name}}/' ./src/SSync.Shared.ClientServer.LitebDB
 
         - name: Restore Client
           run: dotnet restore ./src/SSync.Shared.ClientServer.LitebDB
