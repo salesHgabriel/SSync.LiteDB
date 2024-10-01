@@ -70,4 +70,33 @@ jobs:
             dotnet nuget push output-server/*.nupkg -k ${{ secrets.NUGET_API_KEY_SERVER }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
 # end project ssync server
+
+
+# project ssync shared client and server
+
+
+        - uses: actions/checkout@v4
+        - name: Set Version Client
+          run: |
+            sed -i -e 's/{{Version}}/${{github.ref_name}}/' ./src/SSync.Shared.ClientServer.LitebDB
+
+        - name: Restore Client
+          run: dotnet restore ./src/SSync.Shared.ClientServer.LitebDB
+
+        - name: Build Client
+          run: dotnet build --no-restore  ./src/SSync.Shared.ClientServer.LitebDB
+
+
+        - name: Test Client
+          run: dotnet test --no-build --verbosity normal  ./src/SSync.Shared.ClientServer.LitebDB
+
+        - name: Pack Client
+          run: |
+            dotnet pack ./src/SSync.Shared.ClientServer.LitebDB -c Release -o output-shared
+
+        - name: Publish Shared project to Nuget.Org    
+          run: |
+            dotnet nuget push output-shared/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+
+# end project ssync shared client and server
         

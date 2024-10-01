@@ -4,10 +4,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+
+	  <PackageId>SSync.Shared.ClientServer.LitebDB</PackageId>
+	  <Version>{{Version}}</Version>
+	  <Authors>Gabriel Sales</Authors>
+	  <Copyright>MIT</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageTags>shared database nosql embedded sync api web api</PackageTags>
+	  <Title>SSync Server Client LitebDB Shared</Title>
+	  <RepositoryUrl>https://github.com/salesHgabriel/SSync.LiteDB</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/salesHgabriel/SSync.LiteDB</PackageProjectUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <Description>Shared project to work sync client and server</Description>
+	  <PackageIcon>ssync.png</PackageIcon>
+
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ssync.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
