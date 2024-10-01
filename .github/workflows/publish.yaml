@@ -96,7 +96,7 @@ jobs:
 
         - name: Publish Shared project to Nuget.Org    
           run: |
-            dotnet nuget push output-shared/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push output-shared/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT_SERVER_SHARED }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
 # end project ssync shared client and server
         
