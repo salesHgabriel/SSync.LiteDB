@@ -48,6 +48,16 @@ app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromService
     return Results.Ok(pullChangesRemoter);
 });
 
+app.MapGet("/pull-stream", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+{
+    var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
+    {
+        Mode = Mode.DEBUG
+    });
+
+    return Results.Ok(pullChangesRemoter);
+});
+
 app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
 {
     var query = httpContext.Request.Query;

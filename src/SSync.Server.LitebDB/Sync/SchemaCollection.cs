@@ -95,6 +95,60 @@ namespace SSync.Server.LitebDB.Sync
             return result;
         }
 
+        public async IAsyncEnumerable<object> PullStreamChanges(SSyncParameter parameter, SSyncOptions? options = null)
+        {
+            if (parameter.Colletions.Length == 0)
+            {
+                Log($"Error collection is required", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("You need set collections");
+            }
+
+            if (parameter.Timestamp < 0)
+            {
+                Log($"You can't timespamp to search less zero", consoleColor: ConsoleColor.Red);
+
+                throw new PullChangesException("Timestamp should be zero or more");
+            }
+
+
+            _options = options;
+
+            Log($"Start pull changes delta");
+            var steps = _builder.GetSteps();
+
+            if (steps is not null)
+            {
+                foreach (var (SyncType, Parameter) in steps.Where(s => parameter.Colletions.Contains(s.Parameter)))
+                {
+                    parameter.CurrentColletion = Parameter;
+
+                    Log($"Start pull changes of collection {Parameter}");
+
+                    MethodInfo? method = typeof(SchemaCollection)!
+                        .GetMethod(nameof(CheckChanges), BindingFlags.Instance | BindingFlags.NonPublic)!
+                        .MakeGenericMethod(SyncType, parameter.GetType()) ?? throw new PullChangesException("Not found pull request handler");
+
+                    var task = (Task)method.Invoke(this, [parameter])!;
+
+                    if (task is not null)
+                    {
+                        await task.ConfigureAwait(false);
+
+                        var resultProperty = task.GetType().GetProperty("Result");
+
+                        var collectionResult = resultProperty?.GetValue(task);
+
+                        if (collectionResult is not null)
+                        {
+                            yield return collectionResult;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
         public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
         {
             _options = optionsSync;

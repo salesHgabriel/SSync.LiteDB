@@ -6,7 +6,7 @@ namespace SSync.Server.LitebDB.Abstractions
     public interface ISchemaCollection
     {
         Task<List<object>> PullChangesAsync(SSyncParameter parameter, SSyncOptions? options = null);
-
+        IAsyncEnumerable<object> PullStreamChanges(SSyncParameter parameter, SSyncOptions? options = null);
         Task<bool> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? options = null);
     }
 }
