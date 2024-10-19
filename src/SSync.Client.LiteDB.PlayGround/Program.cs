@@ -78,13 +78,14 @@ try
     var pullChangesBuilder = new SyncPullBuilder();
 
     pullChangesBuilder
-        .AddPullSync(() => sync.PullChangesResult<User>(x, colName, now))
-        .AddPullSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque, now))
+        .AddPullSync(() => sync.PullChangesResult<User>(x, colName))
+        .AddPullSync(() => sync.PullChangesResult<Estoque>(x, colNameEstoque))
         .Build();
 
     var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
 
     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(databaseLocal, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true }));
+    Console.WriteLine(pullChangesBuilder.GetTimestampFromJson());
 
     //sending update database local changes [databaseLocal]
     //post api/push

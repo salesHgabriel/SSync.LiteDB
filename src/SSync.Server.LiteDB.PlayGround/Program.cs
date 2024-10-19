@@ -7,6 +7,7 @@ using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Enums;
+using SSync.Server.LitebDB.Extensions;
 using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -245,26 +246,17 @@ internal class TestDbContext : DbContext, ISSyncDbContextTransaction
     }
 }
 
-internal class User
+internal class User : ISSyncEntityRoot
 {
-    public Guid Id { get; set; }
     public string? Name { get; set; }
-    public DateTime CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
-
-    public DateTime? DeletedAt { get; set; }
 }
 
-internal class Finance
+internal class Finance : ISSyncEntityRoot
 {
-    public Guid Id { get; set; }
     public double Price { get; set; }
-    public DateTime CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
 
-    public DateTime? DeletedAt { get; set; }
 }
 
 internal class PlayParamenter : SSyncParameter
@@ -304,9 +296,9 @@ internal class PullUserRequestHandler : ISSyncPullRequest<UserSync, PlayParament
         var users = await _ctx.User.Select(u => new UserSync(u.Id)
         {
             Name = u.Name,
-            CreatedAt = u.CreatedAt,
-            DeletedAt = u.DeletedAt,
-            UpdatedAt = u.UpdatedAt
+            CreatedAt = u.CreatedAt.ToUnixTimestamp(Time.UTC),
+            DeletedAt = u.DeletedAt.ToUnixTimestamp(Time.UTC),
+            UpdatedAt = u.UpdatedAt.ToUnixTimestamp(Time.UTC)
         }).ToListAsync();
 
         return users;
@@ -327,9 +319,9 @@ internal class PullFinanceRequestHandler : ISSyncPullRequest<FinanceSync, PlayPa
         var finances = await _ctx.Finances.Select(u => new FinanceSync(u.Id)
         {
             Price = new Random().Next(100),
-            CreatedAt = u.CreatedAt,
-            DeletedAt = u.DeletedAt,
-            UpdatedAt = u.UpdatedAt
+            CreatedAt = u.CreatedAt.ToUnixTimestamp(Time.UTC),
+            DeletedAt = u.DeletedAt.ToUnixTimestamp(Time.UTC),
+            UpdatedAt = u.UpdatedAt.ToUnixTimestamp(Time.UTC)
         }).ToListAsync();
 
         return finances;
@@ -348,9 +340,9 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
             .Select(us => new UserSync(id)
             {
                 Name = us.Name,
-                CreatedAt = us.CreatedAt,
-                DeletedAt = us.DeletedAt,
-                UpdatedAt = us.UpdatedAt
+                CreatedAt = us.CreatedAt.ToUnixTimestamp(null),
+                DeletedAt = us.DeletedAt.ToUnixTimestamp(null),
+                UpdatedAt = us.UpdatedAt.ToUnixTimestamp(null)
             })
         .FirstOrDefaultAsync();
     }
@@ -361,9 +353,9 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
         {
             Id = schema.Id,
             Name = schema.Name,
-            CreatedAt = schema.CreatedAt,
-            DeletedAt = schema.DeletedAt,
-            UpdatedAt = schema.UpdatedAt
+            CreatedAt = schema.CreatedAt.FromUnixTimestamp(),
+            DeletedAt = schema.DeletedAt.FromUnixTimestamp(),
+            UpdatedAt = schema.UpdatedAt.FromUnixTimestamp()
         };
 
         await _db.User.AddAsync(us);

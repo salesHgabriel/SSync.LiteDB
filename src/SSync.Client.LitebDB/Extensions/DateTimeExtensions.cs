@@ -33,7 +33,8 @@ namespace SSync.Client.LitebDB.Extensions
 
         public static long ToUnixTimestamp(this DateTime dateTime, Time? time = Time.UTC)
         {
-            var utcOrLocal = time == Time.UTC ? dateTime.ToUniversalTime() : dateTime.ToLocalTime();
+            time ??= Time.UTC;
+            var utcOrLocal = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
             DateTimeOffset dto = new(utcOrLocal);
             return dto.ToUnixTimeSeconds();
         }
@@ -41,6 +42,7 @@ namespace SSync.Client.LitebDB.Extensions
         public static DateTime FromUnixTimestamp(this long timestamp, Time? time = Time.UTC)
         {
             var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
+            time ??= Time.UTC;
 
             return time == Time.UTC ? offset.UtcDateTime : offset.LocalDateTime;
         }

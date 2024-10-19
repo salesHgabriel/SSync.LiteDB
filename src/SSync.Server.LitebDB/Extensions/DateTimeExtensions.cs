@@ -33,16 +33,66 @@ namespace SSync.Server.LitebDB.Extensions
 
         public static long ToUnixTimestamp(this DateTime dateTime, Time? time = Time.UTC)
         {
-            var utcOrLocal = time == Time.UTC ? dateTime.ToUniversalTime() : dateTime.ToLocalTime();
+            time ??= Time.UTC;
+
+            var utcOrLocal = dateTime.Kind switch
+            {
+                DateTimeKind.Utc => dateTime,                       
+                DateTimeKind.Local => time == Time.UTC              
+                    ? dateTime.ToUniversalTime()
+                    : dateTime,                                    
+                _ => time == Time.UTC                              
+                    ? dateTime.ToUniversalTime()                   
+                    : dateTime.ToLocalTime()                       
+            };
+
+         
             DateTimeOffset dto = new(utcOrLocal);
             return dto.ToUnixTimeSeconds();
+        }
+        public static long? ToUnixTimestamp(this DateTime? dateTime, Time? time = Time.UTC)
+        {
+            if (dateTime.HasValue)
+            {
+                time ??= Time.UTC;
+                var utcOrLocal = dateTime.Value.Kind switch
+                {
+                    DateTimeKind.Utc => dateTime,                       
+                    DateTimeKind.Local => time == Time.UTC              
+                        ? dateTime.Value.ToUniversalTime()
+                        : dateTime,                                    
+                    _ => time == Time.UTC                             
+                        ? dateTime.Value.ToUniversalTime()                   
+                        : dateTime.Value.ToLocalTime()                       
+                };
+
+                // Convert to Unix timestamp
+                DateTimeOffset dto = new(utcOrLocal.Value);
+                return dto.ToUnixTimeSeconds();
+            }
+            return null;
         }
 
         public static DateTime FromUnixTimestamp(this long timestamp, Time? time = Time.UTC)
         {
+            time ??= Time.UTC;
+
             var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
 
             return time == Time.UTC ? offset.UtcDateTime : offset.LocalDateTime;
+        }
+
+        public static DateTime? FromUnixTimestamp(this long? timestamp, Time? time = Time.UTC)
+        {
+            if (timestamp is not null)
+            {                
+                time ??= Time.UTC;
+
+                var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp.Value);
+
+                return time == Time.UTC ? offset.UtcDateTime : offset.LocalDateTime;
+            }
+            return null;
         }
     }
 }

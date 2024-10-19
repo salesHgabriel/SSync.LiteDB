@@ -24,7 +24,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(null!);
 
-            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName, now);
+            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName);
 
             //assert
             PullChangesException exception = Assert.Throws<PullChangesException>(act);
@@ -54,7 +54,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(database);
 
-            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName, now);
+            Action act = () => sync.PullChangesResult<User>(lastPulledAt, collectionName);
 
             //assert
             PullChangesException exception = Assert.Throws<PullChangesException>(act);
@@ -85,7 +85,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             sync.DeleteSync(users[3], colUserName);
 
-            var changes = sync.PullChangesResult<User>(0, colUserName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, colUserName);
 
             var expectedUsersCreated = 2;
             var expectedUsersUpdated = 1;

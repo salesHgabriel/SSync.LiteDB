@@ -56,7 +56,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName);
 
             var userCreated = changes.Changes.Created.FirstOrDefault(u => u.Id == newUserid);
 
@@ -88,7 +88,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
@@ -120,7 +120,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
@@ -152,7 +152,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName, DateTime.UtcNow);
+            var changes = sync.PullChangesResult<User>(0, collectionName);
 
             var userDeleted = changes.Changes.Deleted.FirstOrDefault(g => g == newUserid);
 

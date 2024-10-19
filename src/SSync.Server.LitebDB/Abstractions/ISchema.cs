@@ -9,10 +9,10 @@
 
         public Guid Id { get; }
 
-        public DateTime CreatedAt { get; set; }
+        public long CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public long UpdatedAt { get; set; }
 
-        public DateTime? DeletedAt { get; set; }
+        public long? DeletedAt { get; set; }
     }
 }

@@ -78,7 +78,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var timeChanges = 0;
             var now = DateTime.UtcNow;
 
-            var pullLocalCliente = sync.PullChangesResult<User>(timeChanges, colUserName, now);
+            var pullLocalCliente = sync.PullChangesResult<User>(timeChanges, colUserName);
 
             var changesLocalClient = System.Text.Json.JsonSerializer.Serialize(pullLocalCliente, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true });
 

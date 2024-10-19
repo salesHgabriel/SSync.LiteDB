@@ -22,7 +22,6 @@ namespace SSync.Server.LitebDB.Sync
         private readonly IPullExecutionOrderStep _builder;
 
         //TODO: test: USE SINGLETON
-        //private readonly ExecutionOrderStep _builder;
         private readonly IPushExecutionOrderStep _pushBuilder;
 
         private readonly ISSyncDbContextTransaction _sSyncDbContextTransaction;
@@ -106,7 +105,7 @@ namespace SSync.Server.LitebDB.Sync
 
             if (parameter.Timestamp < 0)
             {
-                Log($"You can't timespamp to search less zero", consoleColor: ConsoleColor.Red);
+                Log($"You can't timestamp to search less zero", consoleColor: ConsoleColor.Red);
 
                 throw new PullChangesException("Timestamp should be zero or more");
             }
@@ -142,14 +141,13 @@ namespace SSync.Server.LitebDB.Sync
                         if (collectionResult is not null)
                         {
                             yield return collectionResult;
-                            
                         }
                     }
                 }
             }
         }
 
-        public async Task<bool> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
+        public async Task<long> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
         {
             _options = optionsSync;
 
@@ -171,7 +169,7 @@ namespace SSync.Server.LitebDB.Sync
 
                 Log("Commit Transaction database");
 
-                return true;
+                return schemaChanges;
             }
             catch (Exception ex)
             {
@@ -221,61 +219,43 @@ namespace SSync.Server.LitebDB.Sync
                 var updateds = Enumerable.Empty<TCollection>();
                 var deleteds = new List<Guid>();
 
-                var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
+                var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(_options?.TimeConfig), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
 
-                Log($"Sucessed pull changes all database");
+                Log($"Successfully pull changes all database");
 
                 return allChanges;
             }
 
-            DateTime lastPulledAt = paramenter.Timestamp.FromUnixTimestamp(_options?.TimeConfig);
+            long lastPulledAt = paramenter.Timestamp;
 
+            var syncTimestamp = timestamp.ToUnixTimestamp(_options?.TimeConfig);
+            
             var changesOfTime = new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
-                timestamp.ToUnixTimestamp(),
+                syncTimestamp,
                 new SchemaPullResult<TCollection>.Change(
 
-                     //created: query
-                     //         .Where(d => d.CreatedAt > lastPulledAt)
-                     //         .Where(d => d.CreatedAt <= timestamp)
-                     //         .Where(d => !d.DeletedAt.HasValue)
-                     //         .ToList(),
+                   created: query
+                            .Where(d => d.CreatedAt >= lastPulledAt)          
+                            .Where(d => d.UpdatedAt == d.CreatedAt) 
+                            .Where(d => !d.DeletedAt.HasValue)
+                            .ToList(),
 
-                     //updated: query
-                     //         .Where(d => d.CreatedAt <= lastPulledAt)
-                     //         .Where(d => d.UpdatedAt > lastPulledAt)
-                     //         .Where(d => d.UpdatedAt <= timestamp)
-                     //         .Where(d => !d.DeletedAt.HasValue)
+                   updated: query
+                        .Where(d => d.UpdatedAt >= lastPulledAt)          
+                        .Where(d => d.UpdatedAt != d.CreatedAt)           
+                        .Where(d => !d.DeletedAt.HasValue)
+                        .ToList(),
 
-                     //         .ToList(),
+                   deleted: query
+                        .Where(d => d.DeletedAt >= lastPulledAt)
+                        .Where(d => d.DeletedAt.HasValue)
+                        .Select(d => d.Id)
+                        .Distinct()
+                        .ToList()
+                ));
 
-                     //deleted: query
-                     //         .Where(d => d.CreatedAt <= lastPulledAt)
-                     //         .Where(d => d.DeletedAt > lastPulledAt)
-                     //         .Where(d => d.DeletedAt <= timestamp)
-                     //         .Where(d => d.DeletedAt.HasValue)
-                     //         .Select(d => d.Id)
-                     //         .ToList()
-
-                     created: query
-                             .Where(d => d.CreatedAt > lastPulledAt)
-                             .ToList(),
-
-                    updated: query
-                             .Where(d => d.CreatedAt <= lastPulledAt)
-                             .Where(d => d.UpdatedAt > lastPulledAt)
-                             .ToList(),
-
-                    deleted: query
-                             .Where(d => d.CreatedAt <= lastPulledAt)
-                             .Where(d => d.DeletedAt > lastPulledAt)
-                             .Select(d => d.Id)
-                             .Distinct()
-                             .ToList()
-                    )
-                );
-
-            Log($"Sucessed pull changes database of time {lastPulledAt}");
+            Log($"Successfully pull changes database of time {lastPulledAt}");
 
             return changesOfTime;
         }
@@ -308,7 +288,7 @@ namespace SSync.Server.LitebDB.Sync
                     {
                         var genericMethodParseChanges = parseChangesMethod.MakeGenericMethod(schemaType);
 
-                        var task = (Task<bool>?)genericMethodParseChanges.Invoke(this, [changeObj, parameter, _options]) ?? throw new PushChangeException("task of method not found");
+                        var task = (Task<bool>?)genericMethodParseChanges.Invoke(this, [changeObj, parameter]) ?? throw new PushChangeException("task of method not found");
 
                         if (!await task)
                         {
@@ -342,6 +322,7 @@ namespace SSync.Server.LitebDB.Sync
             var schemaPush = JsonSerializer.Deserialize<SchemaPush<TSchema>>(jsonChange, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy  = JsonNamingPolicy.CamelCase,
                 Converters =
                 {
                     new UnixTimeMillisecondsToDateTimeConverter(_options?.TimeConfig)
@@ -382,7 +363,7 @@ namespace SSync.Server.LitebDB.Sync
             {
                 foreach (var change in schemaPush.Changes.Deleted)
                 {
-                    if (!await requestHandler.DeleteAsync(change, lastPulledAtSync))
+                    if (!await requestHandler.DeleteAsync(change, lastPulledAtSync, _options?.TimeConfig))
                         result = false;
                 }
             }

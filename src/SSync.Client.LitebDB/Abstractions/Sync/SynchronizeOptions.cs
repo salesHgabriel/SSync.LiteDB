@@ -19,5 +19,10 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// If not set true will show output on terminal
         /// </summary>
         public bool SaveLogOnFile { get; set; } = false;
+
+        /// <summary>
+        /// Set config utc or local time
+        /// </summary>
+        public Time Time { get; set; } = Time.UTC;
     }
 }

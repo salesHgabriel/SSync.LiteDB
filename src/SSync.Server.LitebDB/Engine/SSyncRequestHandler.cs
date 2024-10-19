@@ -17,14 +17,15 @@ namespace SSync.Server.LitebDB.Engine
 
         public async Task<bool> UpsertAsync(TSchema schema, DateTime lastPulledAt, Time? time = Time.UTC)
         {
+            time ??= Time.UTC;
             var existingSchema = await _pushRequest.FindByIdAsync(schema.Id);
 
             if (existingSchema is not null)
             {
-                if (existingSchema.DeletedAt.HasValue && existingSchema.DeletedAt.Value.ToUnixTimestamp(time) > 0)
+                if (existingSchema.DeletedAt.HasValue && existingSchema.DeletedAt.Value > 0)
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {schema.GetType().Name} with key {schema.Id} is already deleted.");
-                if (existingSchema.UpdatedAt >= lastPulledAt)
+                if (existingSchema.UpdatedAt >= lastPulledAt.ToUnixTimestamp(time))
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {schema.GetType().Name} with key {schema.Id} is already updated.");
 
@@ -34,13 +35,14 @@ namespace SSync.Server.LitebDB.Engine
             return await _pushRequest.CreateAsync(schema);
         }
 
-        public async Task<bool> DeleteAsync(Guid id, DateTime lastPulledAt)
+        public async Task<bool> DeleteAsync(Guid id, DateTime lastPulledAt, Time? time = Time.UTC)
         {
+            time ??= Time.UTC;
             var existingSchema = await _pushRequest.FindByIdAsync(id);
 
             if (existingSchema is not null)
             {
-                if (existingSchema.UpdatedAt >= lastPulledAt)
+                if (existingSchema.UpdatedAt >= lastPulledAt.ToUnixTimestamp(time))
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {existingSchema.GetType().Name} with key {existingSchema.Id} is already updated.");
 

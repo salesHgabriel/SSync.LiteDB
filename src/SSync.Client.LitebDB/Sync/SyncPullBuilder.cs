@@ -1,6 +1,8 @@
-﻿using SSync.Client.LitebDB.Abstractions;
+﻿using LiteDB;
+using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SSync.Client.LitebDB.Sync
 {
@@ -8,8 +10,8 @@ namespace SSync.Client.LitebDB.Sync
     {
         private readonly List<Func<object>> _actions = new List<Func<object>>();
         public List<object> DatabaseLocalChanges { get; } = new List<object>();
-        public string? JsonDatabaseLocalChanges { get; }
-
+        public string? JsonDatabaseLocalChanges { get; private set; }
+    
         public SyncPullBuilder AddPullSync<T>(Func<SchemaPullResult<T>> action) where T : SchemaSync
         {
             _actions.Add(() => action());
@@ -25,13 +27,34 @@ namespace SSync.Client.LitebDB.Sync
             }
 
             _actions.Clear();
+
+            SetChangesToJson();
+
         }
 
         public string? GetChangesToJson(JsonSerializerOptions? opt =null)
         {
             return DatabaseLocalChanges is not null && DatabaseLocalChanges.Count != 0
-                ? JsonSerializer.Serialize(DatabaseLocalChanges, opt)
+                ? System.Text.Json.JsonSerializer.Serialize(DatabaseLocalChanges, opt)
                 : string.Empty;
+        }
+
+        public void SetChangesToJson()
+        {
+            JsonDatabaseLocalChanges = System.Text.Json.JsonSerializer.Serialize(DatabaseLocalChanges);
+        }
+
+
+        public long GetTimestampFromJson()
+        {
+            if (string.IsNullOrEmpty(JsonDatabaseLocalChanges))
+                return 0;
+
+            var jsonArray = JsonArray.Parse(JsonDatabaseLocalChanges)!.AsArray();
+
+            var timeStamp = jsonArray.Any() ? jsonArray.First()!["timestamp"] ?? jsonArray.First()!["Timestamp"] : 0;
+
+            return long.Parse(timeStamp!.ToString());
         }
     }
 }

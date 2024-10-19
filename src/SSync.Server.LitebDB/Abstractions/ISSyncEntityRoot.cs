@@ -2,8 +2,17 @@
 
 namespace SSync.Server.LitebDB.Abstractions
 {
+
     public abstract class ISSyncEntityRoot
     {
+        /// <summary>
+        /// Default set datetime utc
+        /// </summary>
+        protected ISSyncEntityRoot()
+        {
+            Id = Guid.NewGuid();
+            CreatedAt = DateTime.UtcNow;
+        }
         protected ISSyncEntityRoot(Time time)
         {
             Id = Guid.NewGuid();
@@ -19,8 +28,8 @@ namespace SSync.Server.LitebDB.Abstractions
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        void SetUpdatedAt(DateTime dateTime) => UpdatedAt = dateTime;
-        void SetDeletedAt(DateTime dateTime) => DeletedAt = dateTime;
+        public void SetUpdatedAt(DateTime dateTime) => UpdatedAt = dateTime;
+        public void SetDeletedAt(DateTime dateTime) => DeletedAt = dateTime;
 
     }
 }

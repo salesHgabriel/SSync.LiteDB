@@ -1,5 +1,6 @@
 ﻿using SSync.Client.LitebDB.Abstractions;
 using SSync.Client.LitebDB.Abstractions.Sync;
+using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Poco;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -23,9 +24,11 @@ namespace SSync.Client.LitebDB.Sync
 
             string propertyCol = nameof(SchemaPush<T>.Collection);
 
-            var filteredNode = _databaseRemoteChanges.First(node => node![propertyCol]?.ToString() == collectionName)!;
+            var filteredNode = _databaseRemoteChanges.First(node => node![propertyCol.ToLower()]?.ToString() == collectionName)!;
 
-            var doc = JsonSerializer.Deserialize<SchemaPush<T>>(filteredNode.ToJsonString())!;
+            var parseJsonPascalCase = filteredNode.ToJsonString().ConvertCamelCaseToPascalCaseJson();
+
+            var doc = JsonSerializer.Deserialize<SchemaPush<T>>(parseJsonPascalCase)!;
 
             _actions.Add(() => action(doc));
 

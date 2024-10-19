@@ -11,8 +11,8 @@ namespace SSync.Server.LitebDB.Engine
     public static class SSyncExtensions
     {
         public static IServiceCollection AddSSyncSchemaCollection<TContext>(this IServiceCollection services,
-            Action<IPullExecutionOrderStep>? optionsPullChanges,
-            Action<IPushExecutionOrderStep>? optionsPushChanges) where TContext : DbContext, ISSyncDbContextTransaction
+            Action<IPullExecutionOrderStep> optionsPullChanges,
+            Action<IPushExecutionOrderStep> optionsPushChanges) where TContext : DbContext, ISSyncDbContextTransaction
         {
             services
                 .Scan(scan => scan
@@ -48,19 +48,16 @@ namespace SSync.Server.LitebDB.Engine
                 });
             }
 
-            if (optionsPushChanges is not null)
-            {
+          
                 services.AddScoped<IPushExecutionOrderStep, PushExecutionOrderBuilder>(sp =>
                 {
                     var builder = new PushExecutionOrderBuilder();
                     optionsPushChanges(builder);
                     return builder;
                 });
-            }
+            
 
-            services.AddScoped<ISSyncDbContextTransaction>(provider =>
-               provider.GetRequiredService<TContext>()
-               );
+            services.AddScoped<ISSyncDbContextTransaction>(provider => provider.GetRequiredService<TContext>());
 
             return services;
         }

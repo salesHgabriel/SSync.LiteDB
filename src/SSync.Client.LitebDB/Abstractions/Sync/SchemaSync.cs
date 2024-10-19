@@ -1,5 +1,8 @@
 ﻿using LiteDB;
+using SSync.Client.LitebDB.Enums;
 using SSync.Client.LitebDB.Extensions;
+using System;
+using System.Text.Json.Serialization;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
 {
@@ -15,9 +18,12 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// if datetime is null set value in utc
         /// </summary>
         /// <param name="now"></param>
-        public void CreateAt(DateTime? now = null)
+        public void CreateAt(Time? time)
         {
-            CreatedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
+            time ??= Time.UTC;
+
+            var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
+            CreatedAt = now.ToUnixTimestamp(time);
             Status = StatusSync.CREATED;
         }
 
@@ -25,9 +31,12 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// if datetime is null set value in utc
         /// </summary>
         /// <param name="now"></param>
-        public void UpdateAt(DateTime? now = null)
+        public void UpdateAt(Time? time)
         {
-            UpdatedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
+            time ??= Time.UTC;
+
+            var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
+            UpdatedAt = now.ToUnixTimestamp(time);
             Status = StatusSync.UPDATED;
         }
 
@@ -35,9 +44,13 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         /// if datetime is null set value in utc
         /// </summary>
         /// <param name="now"></param>
-        public void DeleteAt(DateTime? now = null)
+        public void DeleteAt(Time? time)
         {
-            DeletedAt = now is null ? DateTime.UtcNow.ToUnixTimestamp() : now.Value.ToUnixTimestamp();
+            time ??= Time.UTC;
+
+            var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
+
+            DeletedAt = now.ToUnixTimestamp(time);
             Status = StatusSync.DELETED;
         }
 
@@ -50,6 +63,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
 
         public long? DeletedAt { get; set; }
 
-        public StatusSync Status { get; set; }
+        [JsonIgnore]
+        public StatusSync Status { get; set; } = StatusSync.CREATED;
     }
 }

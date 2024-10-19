@@ -7,6 +7,6 @@ namespace SSync.Server.LitebDB.Abstractions.Sync
     {
         Task<bool> UpsertAsync(TSchema schema, DateTime lastPulledAt, Time? time = Time.UTC);
 
-        Task<bool> DeleteAsync(Guid key, DateTime lastPulledAt);
+        Task<bool> DeleteAsync(Guid key, DateTime lastPulledAt, Time? time = Time.UTC);
     }
 }
