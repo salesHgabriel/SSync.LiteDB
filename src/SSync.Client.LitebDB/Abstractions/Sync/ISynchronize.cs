@@ -1,12 +1,11 @@
 ﻿using LiteDB;
-using SSync.Client.LitebDB.Enums;
 using SSync.Client.LitebDB.Poco;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
 {
     public interface ISynchronize
     {
-        long GetLastPulledAt(Time? time);
+        long GetLastPulledAt();
         BsonValue ReplaceLastPulledAt(long lastPulledAt);
 
         BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : SchemaSync;

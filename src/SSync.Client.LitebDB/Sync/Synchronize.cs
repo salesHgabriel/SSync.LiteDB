@@ -77,6 +77,8 @@ namespace SSync.Client.LitebDB.Sync
                 return new SchemaPullResult<T>(collectionName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
             }
 
+
+
             return new SchemaPullResult<T>(
                 collectionName,
                 timestamp,
@@ -89,7 +91,6 @@ namespace SSync.Client.LitebDB.Sync
 
                     updated: updatedQuery
                                         .Where(d => d.UpdatedAt >= lastPulledAt)
-                                        .Where(d => d.UpdatedAt != d.CreatedAt)
                                         .Where(d => !d.DeletedAt.HasValue)
                                          .ToEnumerable(),
 
@@ -163,7 +164,7 @@ namespace SSync.Client.LitebDB.Sync
 
             var colLastPullAt = new LastUpdateAtCol()
             {
-                LastUpdatedAt = (int)lastPulledAt
+                LastUpdatedAt = lastPulledAt
             };
             var bson = collection.Insert(colLastPullAt);
 
@@ -179,9 +180,8 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public long GetLastPulledAt(Time? time)
+        public long GetLastPulledAt()
         {
-            time ??= Time.UTC;
             try
             {
                 _db.Rebuild();
@@ -191,7 +191,9 @@ namespace SSync.Client.LitebDB.Sync
 
                 if (lastPulledAtCollection == null)
                 {
-                    return DateTime.UtcNow.ToUnixTimestamp(time);
+                    Log("first pull server to local database, not exist last pulled");
+
+                    return 0;
                 }
 
                 Log("get row last pulled at");
@@ -372,9 +374,7 @@ namespace SSync.Client.LitebDB.Sync
                 Log($"Start push changes");
 
                 var lastPulledAt = DateTime.Now.ToUnixTimestamp(_options?.Time);
-                Log($"Set last pulled At {lastPulledAt}");
-                ReplaceLastPulledAt(lastPulledAt);
-
+                
                 var idsRemotedCreated = schemaPush.Changes.Created.Select(s => s.Id);
 
                 var idsDatabaseLocal = col.Query()

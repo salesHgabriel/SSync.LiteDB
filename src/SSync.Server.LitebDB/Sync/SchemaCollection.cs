@@ -280,6 +280,10 @@ namespace SSync.Server.LitebDB.Sync
 
                 foreach (var changeObj in changes)
                 {
+                    if (changeObj is null)
+                    {
+                        return 0;
+                    }
                     var collectionName = changeObj!["Collection"]?.ToString() ?? changeObj["collection"]?.ToString();
 
                     Log($"Start {collectionName}");
