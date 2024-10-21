@@ -198,7 +198,7 @@ public string PullLocalChangesToServer()
 
 ```
 
-## Sample my service and view model with flur ()
+## Sample my service and view model with flur (nuget package to work with api requests)
 
 ```cs
     public class ApiService : IApiService
