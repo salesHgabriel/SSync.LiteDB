@@ -27,7 +27,7 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="lastPulledAt"></param>
         /// <param name="collectionName"></param>
         /// <returns></returns>
-        public SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string collectionName) where T : SchemaSync
+        public SchemaPullResult<T> PullChangesResult<T>(DateTime lastPulledAt, string collectionName) where T : SchemaSync
         {
             if (_db is null)
             {
@@ -35,17 +35,10 @@ namespace SSync.Client.LitebDB.Sync
                 throw new PullChangesException("Database not initialized");
             }
 
-            if (lastPulledAt < 0)
-            {
-                Log($"Range less of zero");
-
-                throw new PullChangesException("Range less of zero");
-            }
-
             Log("Start fetch local changes");
 
             collectionName ??= typeof(T).Name;
-            var timestamp = DateTime.UtcNow.ToUnixTimestamp(_options?.Time);
+            var timestamp = _options?.Time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
             var doc = _db.GetCollection<T>(collectionName);
 
             if (doc is null)
@@ -64,7 +57,7 @@ namespace SSync.Client.LitebDB.Sync
             var deletedQuery = doc.Query()
                 .Where(d => d.Status == StatusSync.DELETED);
 
-            if (lastPulledAt == 0)
+            if (lastPulledAt.IsFirstPull())
             {
                 var createds = createdQuery.ToEnumerable();
                 var updateds = updatedQuery.ToEnumerable();
@@ -76,8 +69,6 @@ namespace SSync.Client.LitebDB.Sync
 
                 return new SchemaPullResult<T>(collectionName, timestamp, new SchemaPullResult<T>.Change(createds, updateds, deleteds));
             }
-
-
 
             return new SchemaPullResult<T>(
                 collectionName,
@@ -153,10 +144,10 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public BsonValue ReplaceLastPulledAt(long lastPulledAt)
+        public BsonValue ReplaceLastPulledAt(DateTime lastPulledAt)
         {
             var collection = _db.GetCollection<LastUpdateAtCol>(typeof(LastUpdateAtCol).Name);
-            
+
             //fix empty page database
             _db.Rebuild();
 
@@ -180,32 +171,23 @@ namespace SSync.Client.LitebDB.Sync
         /// <param name="entity"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public long GetLastPulledAt()
+        public DateTime GetLastPulledAt()
         {
-            try
+            _db.Rebuild();
+
+            var col = _db.GetCollection<LastUpdateAtCol>(typeof(LastUpdateAtCol).Name);
+            var lastPulledAtCollection = col.FindAll().FirstOrDefault();
+
+            if (lastPulledAtCollection != null)
             {
-                _db.Rebuild();
-
-                var col = _db.GetCollection<LastUpdateAtCol>(typeof(LastUpdateAtCol).Name);
-                var lastPulledAtCollection = col.FindAll().FirstOrDefault();
-
-                if (lastPulledAtCollection == null)
-                {
-                    Log("first pull server to local database, not exist last pulled");
-
-                    return 0;
-                }
-
                 Log("get row last pulled at");
 
                 return lastPulledAtCollection.LastUpdatedAt;
             }
-            catch (Exception ex)
-            {
 
-                throw;
-            }
+            Log("first pull server to local database, not exist last pulled");
 
+            return DateTime.MinValue;
         }
 
         /// <summary>
@@ -373,8 +355,8 @@ namespace SSync.Client.LitebDB.Sync
             {
                 Log($"Start push changes");
 
-                var lastPulledAt = DateTime.Now.ToUnixTimestamp(_options?.Time);
-                
+                var lastPulledAt = DateTime.UtcNow.GetDaTimeFromConfig(_options?.Time);
+
                 var idsRemotedCreated = schemaPush.Changes.Created.Select(s => s.Id);
 
                 var idsDatabaseLocal = col.Query()

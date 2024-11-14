@@ -8,7 +8,7 @@ SSYNC.LiteDB aims to assist in the data synchronization flow between the backend
 
 ## To update server changes:
 
-## ![alt text](doc/flow_update_server_changes.png "Img Update server changes")
+## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
 ## Flow (en-us):
 ![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
@@ -50,7 +50,7 @@ SSYNC.LiteDB aims to assist in the data synchronization flow between the backend
 // example client with .NET Maui
     public class Note : SchemaSync
     {
-        public Note(Guid id) : base(id)
+        public Note(Guid id) : base(id, SSync.Client.LitebDB.Enums.Time.UTC)
         {
         }
 
@@ -62,7 +62,7 @@ SSYNC.LiteDB aims to assist in the data synchronization flow between the backend
  
 * Your server database você will work only soft delete.
 
-* In your client, you must perform CRUD operations while always updating the date fields. To assist with this, Synchronize provides insert, update, and delete methods to abstract these operations. Using these methods is optional, as long as the date updates are performed.
+* In your client, you must perform CRUD operations while always updating the date fields. To assist with this, Synchronize provides insert, update, and delete methods to abstract these operations. Using these methods is optional, the date updates are performed.
 
 * Your client if not change your database litedb, you need set first pull to get all changes from server e set last pullet At
 
@@ -147,12 +147,12 @@ private string GetPath()
 }
 
 
-public Task SetLastPulledAt(long lastPulledAt)
+public Task SetLastPulledAt(DateTime lastPulledAt)
 {
 	_sync!.ReplaceLastPulledAt(lastPulledAt);
 	return Task.CompletedTask;
 }
-public long GetLastPulledAt()
+public DateTime GetLastPulledAt()
 {
 	return _sync!.GetLastPulledAt();
 }
@@ -230,8 +230,10 @@ public string PullLocalChangesToServer()
             var resp = await result.ResponseMessage.Content.ReadAsStringAsync();
 
 			//always need set lastPulletAt from response to your client litedb to know last sync with your server 
-           await _syncService.SetLastPulledAt(long.Parse(resp));
 
+             var dta = JsonSerializer.Deserialize<DateTimeOffset>(resp);
+             await _syncService.SetLastPulledAt(dta.Date);
+            
             return result.StatusCode;
         }
 
@@ -239,13 +241,13 @@ public string PullLocalChangesToServer()
         {
 			//if true, get all change of server
             // get server database
-            var time = firstPull ? 0 : _syncService.GetLastPulledAt();
+            var time = firstPull ? DateTime.MinValue : _syncService.GetLastPulledAt();
 
             var result = await "https://my-api.com"
             .AppendPathSegment("api/Sync/Pull")
             .AppendQueryParam("Colletions", LiteDbCollection.Note)
             .AppendQueryParam("Colletions", LiteDbCollection.AnoterCollectionName)
-            .AppendQueryParam("Timestamp", time)
+            .AppendQueryParam("Timestamp", time.ToString("o")) // to convert to iso
             .GetAsync();
 
             var res = await result.ResponseMessage.Content.ReadAsStringAsync();
@@ -394,9 +396,9 @@ builder.Services.AddSSyncSchemaCollection<PocDbContext>(
             {
                 Content = n.Content,
                 Completed = n.Completed,
-                CreatedAt = n.CreatedAt.ToUnixTimestamp(Time.UTC),
-                DeletedAt = n.DeletedAt.ToUnixTimestamp(Time.UTC),
-                UpdatedAt = n.UpdatedAt.ToUnixTimestamp(Time.UTC)
+                CreatedAt = n.CreatedAt,
+                DeletedAt = n.DeletedAt,
+                UpdatedAt = n.UpdatedAt
             }).ToListAsync();
 
             return notes;
@@ -424,9 +426,9 @@ builder.Services.AddSSyncSchemaCollection<PocDbContext>(
                {
                    Content = n.Content,
                    Completed = n.Completed,
-                   CreatedAt = n.CreatedAt.ToUnixTimestamp(Time.UTC),
-                   UpdatedAt = n.UpdatedAt.ToUnixTimestamp(Time.UTC),
-                   DeletedAt = n.DeletedAt.ToUnixTimestamp(Time.UTC)
+                   CreatedAt = n.CreatedAt,
+                   UpdatedAt = n.UpdatedAt,
+                   DeletedAt = n.DeletedAt
                }).FirstOrDefaultAsync();
         }
 
@@ -475,6 +477,59 @@ builder.Services.AddSSyncSchemaCollection<PocDbContext>(
         }
     }
 
+
+    // Your Controle ou Endpoint inject ISchemaCollection to use methods pull and push
+
+    // Controller WebApi
+
+          [Route("[action]")]
+        [HttpGet]
+        public async Task<IActionResult> Pull([FromQuery] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection)
+        {
+            return Ok(await schemaCollection.PullChangesAsync(parameter));
+        }
+
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> Push([FromQuery] SSyncParameter parameter, [FromBody] JsonArray changes, [FromServices] ISchemaCollection schemaCollection)
+        {
+            if (changes is not null)
+            {
+                return Ok(await schemaCollection.PushChangesAsync(changes, parameter));
+            }
+            return BadRequest();
+        }
+    
+    // Minimal api
+    
+     app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+    {
+        var pullChangesRemoter = await schemaCollection.PullChangesAsync(parameter, new SSyncOptions()
+        {
+            Mode = Mode.DEBUG
+        });
+
+        return Results.Ok(pullChangesRemoter);
+    });
+
+    app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
+    {
+        var query = httpContext.Request.Query;
+
+        var parameter = new PlayParamenter
+        {
+            Time = Convert.ToInt32(query["time"]),
+            Colletions = query["colletions"].ToArray()!,
+            Timestamp = DateTime.TryParse(query["timestamp"], out DateTime timestamp) ? timestamp : DateTime.MinValue
+        };
+
+        var isOk = await schemaCollection.PushChangesAsync(changes, parameter, new SSyncOptions()
+        {
+            Mode = Mode.DEBUG
+        });
+
+        return Results.Ok(isOk);
+    });
 
 ``
 

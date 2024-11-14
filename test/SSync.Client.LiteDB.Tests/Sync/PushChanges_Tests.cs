@@ -15,7 +15,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var now = DateTime.Now;
 
@@ -36,7 +36,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var now = DateTime.Now;
 
@@ -61,7 +61,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
             {
-                Name = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}"
+                Name = $"Cotoso {DateTime.UtcNow}"
             }).ToArray();
 
             using var database = new LiteDatabase(new MemoryStream());
@@ -75,7 +75,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             sync.UpdateSync(users[0], colUserName);
 
-            var timeChanges = 0;
+            var timeChanges = DateTime.MinValue;
             var now = DateTime.UtcNow;
 
             var pullLocalCliente = sync.PullChangesResult<User>(timeChanges, colUserName);
@@ -87,7 +87,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
             var newDeleted = pullLocalCliente.Changes.Deleted.Append(guidFistUserCreate);
             var newCreated = pullLocalCliente.Changes.Created.Where(u => u.Id != guidFistUserCreate);
 
-            var changesServer = new SchemaPullResult<User>(colUserName, now.ToUnixTimestamp(), new SchemaPullResult<User>.Change(newCreated, pullLocalCliente.Changes.Updated, newDeleted));
+            var changesServer = new SchemaPullResult<User>(colUserName, now, new SchemaPullResult<User>.Change(newCreated, pullLocalCliente.Changes.Updated, newDeleted));
 
             var listChanges = System.Text.Json.JsonSerializer.Serialize(changesServer);
 

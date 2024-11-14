@@ -24,7 +24,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "pull?Colletions=User&Timestamp=0&Time=34234",
+      "launchUrl": "pull?Colletions=User&Timestamp=1/1/0001 12:00:00 AM&Time=34234",
       "applicationUrl": "https://localhost:7208;http://localhost:5130",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -22,10 +22,10 @@ namespace SSync.Server.LitebDB.Engine
 
             if (existingSchema is not null)
             {
-                if (existingSchema.DeletedAt.HasValue && existingSchema.DeletedAt.Value > 0)
+                if (existingSchema.DeletedAt.HasValue && existingSchema.DeletedAt.Value > DateTime.MinValue)
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {schema.GetType().Name} with key {schema.Id} is already deleted.");
-                if (existingSchema.UpdatedAt >= lastPulledAt.ToUnixTimestamp(time))
+                if (existingSchema.UpdatedAt >= lastPulledAt)
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {schema.GetType().Name} with key {schema.Id} is already updated.");
 
@@ -42,7 +42,7 @@ namespace SSync.Server.LitebDB.Engine
 
             if (existingSchema is not null)
             {
-                if (existingSchema.UpdatedAt >= lastPulledAt.ToUnixTimestamp(time))
+                if (existingSchema.UpdatedAt >= lastPulledAt)
                     throw new SSyncLiteDBExcepetion(
                         $"Entity {existingSchema.GetType().Name} with key {existingSchema.Id} is already updated.");
 

@@ -17,7 +17,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
             var parameter = new SSyncParameter()
             {
                 Colletions = [],
-                Timestamp = 0
+                Timestamp = DateTime.UtcNow
             };
 
             var schemaMock = new Mock<ISchemaCollection>();
@@ -33,7 +33,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
             var parameter = new SSyncParameter()
             {
                 Colletions = [],
-                Timestamp = 0
+                Timestamp = DateTime.UtcNow
             };
 
             var syncServiceMock = new Mock<ISSyncServices>();
@@ -52,30 +52,6 @@ namespace SSync.Server.LitebDB.Tests.Sync
             Assert.Equal("You need set collections", exception.Message);
         }
 
-        [Fact]
-        public async Task SetTimeStampLessThanZero_ShouldReturnPullChangesException()
-        {
-            var parameter = new SSyncParameter()
-            {
-                Colletions = ["User"],
-                Timestamp = -1
-            };
-
-            var syncServiceMock = new Mock<ISSyncServices>();
-            var pullExecutionMock = new Mock<IPullExecutionOrderStep>();
-            var pushExecutionMock = new Mock<IPushExecutionOrderStep>();
-            var syncDbContextTransactionMock = new Mock<ISSyncDbContextTransaction>();
-
-            pullExecutionMock.Setup(s => s.By<UserSync>("user"));
-
-            var schemaCollection = new SchemaCollection(syncServiceMock.Object, pullExecutionMock.Object, pushExecutionMock.Object, syncDbContextTransactionMock.Object);
-
-            async Task<List<object>> act() => await schemaCollection.PullChangesAsync(parameter);
-
-            PullChangesException exception = await Assert.ThrowsAsync<PullChangesException>((Func<Task<List<object>>>)act);
-
-            Assert.Equal("Timestamp should be zero or more", exception.Message);
-        }
 
         //TODO: FINISH THIS TEST
 
@@ -85,7 +61,7 @@ namespace SSync.Server.LitebDB.Tests.Sync
             var parameter = new SSyncParameter()
             {
                 Colletions = ["User"],
-                Timestamp = 0
+                Timestamp = DateTime.MinValue
             };
 
             var syncServiceMock = new Mock<ISSyncServices>();

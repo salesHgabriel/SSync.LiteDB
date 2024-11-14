@@ -2,7 +2,7 @@
 {
     public class LastUpdateAtCol
     {
-        public long LastUpdatedAt { get; set; }
+        public DateTime LastUpdatedAt { get; set; }
 
     }
 }

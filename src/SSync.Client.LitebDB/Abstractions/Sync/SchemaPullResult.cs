@@ -6,7 +6,7 @@
         {
         }
 
-        public SchemaPullResult(string? collection, long timestamp, Change changesModel)
+        public SchemaPullResult(string? collection, DateTime timestamp, Change changesModel)
         {
             Collection = collection;
             Timestamp = timestamp;
@@ -14,7 +14,7 @@
         }
 
         public string? Collection { get; private set; }
-        public long? Timestamp { get; private set; } = 0;
+        public DateTime? Timestamp { get; private set; } = DateTime.UtcNow;
         public Change Changes { get; private set; } = default!;
 
         public class Change

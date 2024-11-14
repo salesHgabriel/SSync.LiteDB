@@ -7,7 +7,6 @@ using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Enums;
-using SSync.Server.LitebDB.Extensions;
 using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,16 +48,6 @@ app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromService
     return Results.Ok(pullChangesRemoter);
 });
 
-app.MapGet("/pull-stream", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
-{
-    var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
-    {
-        Mode = Mode.DEBUG
-    });
-
-    return Results.Ok(pullChangesRemoter);
-});
-
 app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
 {
     var query = httpContext.Request.Query;
@@ -67,7 +56,7 @@ app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromSer
     {
         Time = Convert.ToInt32(query["time"]),
         Colletions = query["colletions"].ToArray()!,
-        Timestamp = long.TryParse(query["timestamp"], out long timestamp) ? timestamp : 0
+        Timestamp = DateTime.TryParse(query["timestamp"], out DateTime timestamp) ? timestamp : DateTime.MinValue
     };
 
     var isOk = await schemaCollection.PushChangesAsync(changes, parameter, new SSyncOptions()
@@ -77,6 +66,17 @@ app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromSer
 
     return Results.Ok(isOk);
 });
+
+app.MapGet("/pull-stream", ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+{
+    var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
+    {
+        Mode = Mode.DEBUG
+    });
+
+    return Results.Ok(pullChangesRemoter);
+});
+
 
 app.MapGet("/list", async ([FromServices] TestDbContext cxt) =>
 {
@@ -296,9 +296,9 @@ internal class PullUserRequestHandler : ISSyncPullRequest<UserSync, PlayParament
         var users = await _ctx.User.Select(u => new UserSync(u.Id)
         {
             Name = u.Name,
-            CreatedAt = u.CreatedAt.ToUnixTimestamp(Time.UTC),
-            DeletedAt = u.DeletedAt.ToUnixTimestamp(Time.UTC),
-            UpdatedAt = u.UpdatedAt.ToUnixTimestamp(Time.UTC)
+            CreatedAt = u.CreatedAt,
+            DeletedAt = u.DeletedAt,
+            UpdatedAt = u.UpdatedAt
         }).ToListAsync();
 
         return users;
@@ -319,9 +319,9 @@ internal class PullFinanceRequestHandler : ISSyncPullRequest<FinanceSync, PlayPa
         var finances = await _ctx.Finances.Select(u => new FinanceSync(u.Id)
         {
             Price = new Random().Next(100),
-            CreatedAt = u.CreatedAt.ToUnixTimestamp(Time.UTC),
-            DeletedAt = u.DeletedAt.ToUnixTimestamp(Time.UTC),
-            UpdatedAt = u.UpdatedAt.ToUnixTimestamp(Time.UTC)
+            CreatedAt = u.CreatedAt,
+            DeletedAt = u.DeletedAt,
+            UpdatedAt = u.UpdatedAt
         }).ToListAsync();
 
         return finances;
@@ -340,9 +340,9 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
             .Select(us => new UserSync(id)
             {
                 Name = us.Name,
-                CreatedAt = us.CreatedAt.ToUnixTimestamp(null),
-                DeletedAt = us.DeletedAt.ToUnixTimestamp(null),
-                UpdatedAt = us.UpdatedAt.ToUnixTimestamp(null)
+                CreatedAt = us.CreatedAt,
+                DeletedAt = us.DeletedAt,
+                UpdatedAt = us.UpdatedAt
             })
         .FirstOrDefaultAsync();
     }
@@ -353,9 +353,9 @@ internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
         {
             Id = schema.Id,
             Name = schema.Name,
-            CreatedAt = schema.CreatedAt.FromUnixTimestamp(),
-            DeletedAt = schema.DeletedAt.FromUnixTimestamp(),
-            UpdatedAt = schema.UpdatedAt.FromUnixTimestamp()
+            CreatedAt = schema.CreatedAt,
+            DeletedAt = schema.DeletedAt,
+            UpdatedAt = schema.UpdatedAt
         };
 
         await _db.User.AddAsync(us);

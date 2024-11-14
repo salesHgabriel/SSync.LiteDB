@@ -71,7 +71,7 @@ try
 
     //pull local
 
-    var x = 0;
+    var x = DateTime.MinValue;
 
     var now = DateTime.UtcNow;
 

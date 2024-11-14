@@ -9,11 +9,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
     public class WrapperPersistentSync_Tests
     {
         [Fact]
-        public void InsertCollectionSync_ShouldReturnCreatedAtMoreZero()
+        public void InsertCollectionSync_ShouldReturnCreatedAtMoreMinDateTime()
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 
@@ -32,7 +32,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var user = sync.FindByIdSync<User>(newUserid, collectionName);
 
-            Assert.True(user.CreatedAt > 0);
+            Assert.True(user.CreatedAt > DateTime.MinValue);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 
@@ -56,7 +56,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName);
+            var changes = sync.PullChangesResult<User>(DateTime.MinValue, collectionName);
 
             var userCreated = changes.Changes.Created.FirstOrDefault(u => u.Id == newUserid);
 
@@ -64,11 +64,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
         }
 
         [Fact]
-        public void UpdateCollectionSync_ShouldReturnCreatedAtMoreZero()
+        public void UpdateCollectionSync_ShouldReturnCreatedAtMoreDateMin()
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 
@@ -88,11 +88,11 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName);
+            var changes = sync.PullChangesResult<User>(DateTime.MinValue, collectionName);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
-            Assert.True(userUpdated!.UpdatedAt > 0);
+            Assert.True(userUpdated!.UpdatedAt > DateTime.MinValue);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 
@@ -120,7 +120,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName);
+            var changes = sync.PullChangesResult<User>(DateTime.MinValue, collectionName);
 
             var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
@@ -132,7 +132,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 
@@ -152,7 +152,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             //assert
 
-            var changes = sync.PullChangesResult<User>(0, collectionName);
+            var changes = sync.PullChangesResult<User>(DateTime.MinValue, collectionName);
 
             var userDeleted = changes.Changes.Deleted.FirstOrDefault(g => g == newUserid);
 
@@ -164,7 +164,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
             var collectionName = "user";
 

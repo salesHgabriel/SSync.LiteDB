@@ -1,7 +1,6 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Exceptions;
-using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Sync;
 
 
@@ -14,9 +13,9 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
-            var lastPulledAt = -1;
+            var lastPulledAt = DateTime.MinValue;
             var collectionName = "user";
             var now = DateTime.Now;
 
@@ -37,9 +36,9 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             //arrange
             var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}";
+            var newUserName = $"Cotoso {DateTime.UtcNow}";
 
-            var lastPulledAt = -1;
+            var lastPulledAt = DateTime.MinValue;
             var collectionName = "user";
             var now = DateTime.Now;
 
@@ -69,7 +68,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
             {
-                Name = $"Cotoso {DateTime.UtcNow.ToUnixTimestamp()}"
+                Name = $"Cotoso {DateTime.UtcNow}"
             }).ToArray();
 
             using var database = new LiteDatabase(new MemoryStream());
@@ -85,7 +84,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             sync.DeleteSync(users[3], colUserName);
 
-            var changes = sync.PullChangesResult<User>(0, colUserName);
+            var changes = sync.PullChangesResult<User>(DateTime.MinValue, colUserName);
 
             var expectedUsersCreated = 2;
             var expectedUsersUpdated = 1;

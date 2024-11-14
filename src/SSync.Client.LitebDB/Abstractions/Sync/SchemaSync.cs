@@ -1,7 +1,5 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Enums;
-using SSync.Client.LitebDB.Extensions;
-using System;
 using System.Text.Json.Serialization;
 
 namespace SSync.Client.LitebDB.Abstractions.Sync
@@ -12,7 +10,18 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         {
         }
 
-        protected SchemaSync(Guid id) : base() => Id = id;
+        protected SchemaSync(Guid id) : base()
+        {
+            Id = id;
+        }
+
+        protected SchemaSync(Guid id, Time? time) : base()
+        {
+            Id = id;
+
+            CreateAt(time);
+            UpdateAt(time);
+        }
 
         /// <summary>
         /// if datetime is null set value in utc
@@ -23,7 +32,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
             time ??= Time.UTC;
 
             var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
-            CreatedAt = now.ToUnixTimestamp(time);
+            CreatedAt = now;
             Status = StatusSync.CREATED;
         }
 
@@ -36,7 +45,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
             time ??= Time.UTC;
 
             var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
-            UpdatedAt = now.ToUnixTimestamp(time);
+            UpdatedAt = now;
             Status = StatusSync.UPDATED;
         }
 
@@ -50,18 +59,18 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
 
             var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
 
-            DeletedAt = now.ToUnixTimestamp(time);
+            DeletedAt = now;
             Status = StatusSync.DELETED;
         }
 
         [BsonId]
         public Guid Id { get; set; }
 
-        public long CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public long UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
-        public long? DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         [JsonIgnore]
         public StatusSync Status { get; set; } = StatusSync.CREATED;

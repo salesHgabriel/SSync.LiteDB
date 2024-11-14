@@ -5,8 +5,8 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
 {
     public interface ISynchronize
     {
-        long GetLastPulledAt();
-        BsonValue ReplaceLastPulledAt(long lastPulledAt);
+        DateTime GetLastPulledAt();
+        BsonValue ReplaceLastPulledAt(DateTime lastPulledAt);
 
         BsonValue DeleteSync<T>(T entity, ILiteCollection<T> col) where T : SchemaSync;
 
@@ -21,7 +21,7 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
 
         BsonValue InsertSync<T>(T entity, string? colName) where T : SchemaSync;
 
-        SchemaPullResult<T> PullChangesResult<T>(long lastPulledAt, string collectionName) where T : SchemaSync;
+        SchemaPullResult<T> PullChangesResult<T>(DateTime lastPulledAt, string collectionName) where T : SchemaSync;
 
         SchemaPush<T> PushChangesResult<T>(SchemaPush<T> schemaPush) where T : SchemaSync;
         BsonValue UpdateSync<T>(T entity, string? colName) where T : SchemaSync;

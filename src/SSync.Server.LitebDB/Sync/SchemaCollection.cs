@@ -2,7 +2,6 @@
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
-using SSync.Server.LitebDB.Converters;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Enums;
 using SSync.Server.LitebDB.Exceptions;
@@ -45,13 +44,6 @@ namespace SSync.Server.LitebDB.Sync
                 Log($"Error collection is required", consoleColor: ConsoleColor.Red);
 
                 throw new PullChangesException("You need set collections");
-            }
-
-            if (parameter.Timestamp < 0)
-            {
-                Log($"You can't timespamp to search less zero", consoleColor: ConsoleColor.Red);
-
-                throw new PullChangesException("Timestamp should be zero or more");
             }
 
             _options = options;
@@ -103,14 +95,6 @@ namespace SSync.Server.LitebDB.Sync
                 throw new PullChangesException("You need set collections");
             }
 
-            if (parameter.Timestamp < 0)
-            {
-                Log($"You can't timestamp to search less zero", consoleColor: ConsoleColor.Red);
-
-                throw new PullChangesException("Timestamp should be zero or more");
-            }
-
-
             _options = options;
 
             Log($"Start pull changes delta");
@@ -147,7 +131,7 @@ namespace SSync.Server.LitebDB.Sync
             }
         }
 
-        public async Task<long> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
+        public async Task<DateTime> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? optionsSync = null)
         {
             _options = optionsSync;
 
@@ -210,7 +194,7 @@ namespace SSync.Server.LitebDB.Sync
 
             var query = await handler.QueryAsync(paramenter);
 
-            if (paramenter.Timestamp == 0)
+            if (DateTimeExtension.IsFirstPull(paramenter.Timestamp))
             {
                 var createds = query
                     .Where(entity => entity.DeletedAt == null)
@@ -219,16 +203,16 @@ namespace SSync.Server.LitebDB.Sync
                 var updateds = Enumerable.Empty<TCollection>();
                 var deleteds = new List<Guid>();
 
-                var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp.ToUnixTimestamp(_options?.TimeConfig), new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
+                var allChanges = new SchemaPullResult<TCollection>(paramenter.CurrentColletion, timestamp, new SchemaPullResult<TCollection>.Change(createds, updateds, deleteds));
 
                 Log($"Successfully pull changes all database");
 
                 return allChanges;
             }
 
-            long lastPulledAt = paramenter.Timestamp;
+            DateTime lastPulledAt = paramenter.Timestamp;
 
-            var syncTimestamp = timestamp.ToUnixTimestamp(_options?.TimeConfig);
+            var syncTimestamp = timestamp;
             
             var changesOfTime = new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
@@ -260,7 +244,7 @@ namespace SSync.Server.LitebDB.Sync
             return changesOfTime;
         }
 
-        private async Task<long> ExecuteChanges(JsonArray changes, SSyncParameter parameter)
+        private async Task<DateTime> ExecuteChanges(JsonArray changes, SSyncParameter parameter)
         {
             try
             {
@@ -282,7 +266,7 @@ namespace SSync.Server.LitebDB.Sync
                 {
                     if (changeObj is null)
                     {
-                        return 0;
+                        return DateTime.MinValue;
                     }
                     var collectionName = changeObj!["Collection"]?.ToString() ?? changeObj["collection"]?.ToString();
 
@@ -303,8 +287,7 @@ namespace SSync.Server.LitebDB.Sync
                     }
                 }
 
-                var currentTime = _options?.TimeConfig == Time.UTC ? DateTime.UtcNow : DateTime.Now;
-                return currentTime.ToUnixTimestamp(_options?.TimeConfig);
+                return _options?.TimeConfig == Time.UTC ? DateTime.UtcNow : DateTime.Now;
             }
             catch (Exception ex)
             {
@@ -326,11 +309,7 @@ namespace SSync.Server.LitebDB.Sync
             var schemaPush = JsonSerializer.Deserialize<SchemaPush<TSchema>>(jsonChange, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy  = JsonNamingPolicy.CamelCase,
-                Converters =
-                {
-                    new UnixTimeMillisecondsToDateTimeConverter(_options?.TimeConfig)
-                }
+                PropertyNamingPolicy  = JsonNamingPolicy.CamelCase
             });
 
             var result = true;
@@ -343,7 +322,7 @@ namespace SSync.Server.LitebDB.Sync
 
             var requestHandler = _syncServices.PushRequestHandler<TSchema>();
 
-            var lastPulledAtSync = parameter.Timestamp.FromUnixTimestamp(_options?.TimeConfig);
+            var lastPulledAtSync = DateTimeExtension.ParseDaTimeFromConfig(parameter.Timestamp,_options?.TimeConfig);
 
             if (schemaPush.Changes.Created.Any())
             {

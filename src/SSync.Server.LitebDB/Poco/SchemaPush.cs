@@ -6,7 +6,7 @@ namespace SSync.Server.LitebDB.Poco
     public class SchemaPush<T> where T : ISchema
     {
         public string? Collection { get; set; }
-        public long Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
         public Change Changes { get; set; } = default!;
 
         [JsonIgnore]

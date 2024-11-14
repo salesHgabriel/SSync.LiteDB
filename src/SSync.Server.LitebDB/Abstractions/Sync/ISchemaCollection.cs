@@ -7,6 +7,6 @@ namespace SSync.Server.LitebDB.Abstractions
     {
         Task<List<object>> PullChangesAsync(SSyncParameter parameter, SSyncOptions? options = null);
         IAsyncEnumerable<object> PullStreamChanges(SSyncParameter parameter, SSyncOptions? options = null);
-        Task<long> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? options = null);
+        Task<DateTime> PushChangesAsync(JsonArray changes, SSyncParameter parameter, SSyncOptions? options = null);
     }
 }

@@ -5,7 +5,7 @@ namespace SSync.Server.LitebDB.Engine
     public class SSyncParameter
     {
         public string[] Colletions { get; set; } = [];
-        public long Timestamp { get; set; } = 0;
+        public DateTime Timestamp { get; set; } = DateTime.MinValue;
 
         [JsonIgnore]
         internal string CurrentColletion { get; set; } = string.Empty;
