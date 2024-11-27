@@ -12,16 +12,19 @@ namespace SSync.Server.LitebDB.Abstractions
         {
             Id = Guid.NewGuid();
             CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
         protected ISSyncEntityRoot(Time time)
         {
             Id = Guid.NewGuid();
             CreatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
+            UpdatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
         }
         protected ISSyncEntityRoot(Guid id, Time time)
         {
             Id = id;
             CreatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
+            UpdatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
         }
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

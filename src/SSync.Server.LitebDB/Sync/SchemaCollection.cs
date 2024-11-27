@@ -282,7 +282,9 @@ namespace SSync.Server.LitebDB.Sync
                         {
                             Log($"Error in parse change of collection {collectionName} to type {schemaType.Name}", consoleColor: ConsoleColor.Red);
 
-                            throw new PushChangeException("Not push changes");
+                            Log($"Not push changes", consoleColor: ConsoleColor.Red);
+
+                            // throw new PushChangeException("Not push changes");
                         }
                     }
                 }
