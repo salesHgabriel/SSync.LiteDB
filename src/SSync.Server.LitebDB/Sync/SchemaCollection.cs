@@ -15,24 +15,25 @@ using System.Text.Json.Nodes;
 
 namespace SSync.Server.LitebDB.Sync
 {
-    public class SchemaCollection : ISchemaCollection
+    public class SchemaCollection : ISchemaCollection, IDisposable
     {
         private readonly ISSyncServices _syncServices;
-        private readonly IPullExecutionOrderStep _builder;
+        private readonly ISSyncDbContextTransaction _sSyncDbContextTransaction;
+        private IPullExecutionOrderStep? _pullBuilder;
 
         //TODO: test: USE SINGLETON
-        private readonly IPushExecutionOrderStep _pushBuilder;
+        private IPushExecutionOrderStep? _pushBuilder;
 
-        private readonly ISSyncDbContextTransaction _sSyncDbContextTransaction;
         private SSyncOptions? _options = null;
+        private bool _disposedValue;
 
         public SchemaCollection(ISSyncServices syncServices,
-            IPullExecutionOrderStep builder,
+            IPullExecutionOrderStep pullBuilder,
             IPushExecutionOrderStep pushBuilder,
             ISSyncDbContextTransaction sSyncDbContextTransaction)
         {
             _syncServices = syncServices;
-            _builder = builder;
+            _pullBuilder = pullBuilder;
             _pushBuilder = pushBuilder;
             _sSyncDbContextTransaction = sSyncDbContextTransaction;
         }
@@ -51,7 +52,7 @@ namespace SSync.Server.LitebDB.Sync
             var result = new List<object>();
 
             Log($"Start pull changes");
-            var steps = _builder.GetSteps();
+            var steps = _pullBuilder?.GetSteps();
 
             if (steps is not null)
             {
@@ -98,7 +99,7 @@ namespace SSync.Server.LitebDB.Sync
             _options = options;
 
             Log($"Start pull changes delta");
-            var steps = _builder.GetSteps();
+            var steps = _pullBuilder?.GetSteps();
 
             if (steps is not null)
             {
@@ -213,21 +214,21 @@ namespace SSync.Server.LitebDB.Sync
             DateTime lastPulledAt = paramenter.Timestamp;
 
             var syncTimestamp = timestamp;
-            
+
             var changesOfTime = new SchemaPullResult<TCollection>(
                 paramenter.CurrentColletion,
                 syncTimestamp,
                 new SchemaPullResult<TCollection>.Change(
 
                    created: query
-                            .Where(d => d.CreatedAt >= lastPulledAt)          
-                            .Where(d => d.UpdatedAt == d.CreatedAt) 
+                            .Where(d => d.CreatedAt >= lastPulledAt)
+                            .Where(d => d.UpdatedAt == d.CreatedAt)
                             .Where(d => !d.DeletedAt.HasValue)
                             .ToList(),
 
                    updated: query
-                        .Where(d => d.UpdatedAt >= lastPulledAt)          
-                        .Where(d => d.UpdatedAt != d.CreatedAt)           
+                        .Where(d => d.UpdatedAt >= lastPulledAt)
+                        .Where(d => d.UpdatedAt != d.CreatedAt)
                         .Where(d => !d.DeletedAt.HasValue)
                         .ToList(),
 
@@ -252,39 +253,40 @@ namespace SSync.Server.LitebDB.Sync
 
                 ArgumentNullException.ThrowIfNull(changes);
 
-                var schemasSync = _pushBuilder.GetSchemas();
+                var schemasSync = _pushBuilder?.GetSchemas();
 
-                var collectionOrder = _pushBuilder.GetCollectionOrder();
-
-                var parseChangesMethod = GetType().GetMethod(nameof(ParseChanges), BindingFlags.Instance | BindingFlags.NonPublic);
-
-                ArgumentNullException.ThrowIfNull(parseChangesMethod);
-
-                var changesMap = new Dictionary<string, SchemaPush<ISchema>>();
-
-                foreach (var changeObj in changes)
+                if (schemasSync is not null)
                 {
-                    if (changeObj is null)
+                    var parseChangesMethod = GetType().GetMethod(nameof(ParseChanges), BindingFlags.Instance | BindingFlags.NonPublic);
+
+                    ArgumentNullException.ThrowIfNull(parseChangesMethod);
+
+                    var changesMap = new Dictionary<string, SchemaPush<ISchema>>();
+
+                    foreach (var changeObj in changes)
                     {
-                        return DateTime.MinValue;
-                    }
-                    var collectionName = changeObj!["Collection"]?.ToString() ?? changeObj["collection"]?.ToString();
-
-                    Log($"Start {collectionName}");
-
-                    if (!string.IsNullOrEmpty(collectionName) && schemasSync.TryGetValue(collectionName, out var schemaType))
-                    {
-                        var genericMethodParseChanges = parseChangesMethod.MakeGenericMethod(schemaType);
-
-                        var task = (Task<bool>?)genericMethodParseChanges.Invoke(this, [changeObj, parameter]) ?? throw new PushChangeException("task of method not found");
-
-                        if (!await task)
+                        if (changeObj is null)
                         {
-                            Log($"Error in parse change of collection {collectionName} to type {schemaType.Name}", consoleColor: ConsoleColor.Red);
+                            return DateTime.MinValue;
+                        }
+                        var collectionName = changeObj!["Collection"]?.ToString() ?? changeObj["collection"]?.ToString();
 
-                            Log($"Not push changes", consoleColor: ConsoleColor.Red);
+                        Log($"Start {collectionName}");
 
-                            // throw new PushChangeException("Not push changes");
+                        if (!string.IsNullOrEmpty(collectionName) && schemasSync.TryGetValue(collectionName, out var schemaType))
+                        {
+                            var genericMethodParseChanges = parseChangesMethod.MakeGenericMethod(schemaType);
+
+                            var task = (Task<bool>?)genericMethodParseChanges.Invoke(this, [changeObj, parameter]) ?? throw new PushChangeException("task of method not found");
+
+                            if (!await task)
+                            {
+                                Log($"Error in parse change of collection {collectionName} to type {schemaType.Name}", consoleColor: ConsoleColor.Red);
+
+                                Log($"Not push changes", consoleColor: ConsoleColor.Red);
+
+                                // throw new PushChangeException("Not push changes");
+                            }
                         }
                     }
                 }
@@ -311,7 +313,7 @@ namespace SSync.Server.LitebDB.Sync
             var schemaPush = JsonSerializer.Deserialize<SchemaPush<TSchema>>(jsonChange, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy  = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
             var result = true;
@@ -324,7 +326,7 @@ namespace SSync.Server.LitebDB.Sync
 
             var requestHandler = _syncServices.PushRequestHandler<TSchema>();
 
-            var lastPulledAtSync = DateTimeExtension.ParseDaTimeFromConfig(parameter.Timestamp,_options?.TimeConfig);
+            var lastPulledAtSync = DateTimeExtension.ParseDaTimeFromConfig(parameter.Timestamp, _options?.TimeConfig);
 
             if (schemaPush.Changes.Created.Any())
             {
@@ -381,6 +383,28 @@ namespace SSync.Server.LitebDB.Sync
                     Console.ForegroundColor = consoleColor;
                     Console.WriteLine(msg.ToString());
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _pullBuilder = null;
+                    _pushBuilder = null;
+                    _options = null;
+                }
+
+                _disposedValue = true;
             }
         }
     }

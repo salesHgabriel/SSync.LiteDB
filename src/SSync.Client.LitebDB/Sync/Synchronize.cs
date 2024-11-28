@@ -4,14 +4,16 @@ using SSync.Client.LitebDB.Enums;
 using SSync.Client.LitebDB.Exceptions;
 using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Poco;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SSync.Client.LitebDB.Sync
 {
-    public class Synchronize : ISynchronize
+    public class Synchronize : ISynchronize, IDisposable
     {
         private readonly LiteDatabase _db;
-        private readonly SynchronizeOptions? _options;
+        private SynchronizeOptions? _options;
+        private bool _disposedValue;
 
         public Synchronize(LiteDatabase db, SynchronizeOptions? options = null)
         {
@@ -447,5 +449,28 @@ namespace SSync.Client.LitebDB.Sync
                 }
             }
         }
+
+        public void Dispose()
+        {
+           Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _db.Dispose();
+                    _options = null;
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+
     }
 }
