@@ -1,23 +1,20 @@
 ![alt text](doc/ssync_thumb.png "Img thumb ssynclitedb")
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/salesHgabriel/SSync.LiteDB/blob/master/readme.md)
-[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/salesHgabriel/SSync.LiteDB/blob/master/readme.pt-br.md)
+## Sobre:
+SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de dados entre frontend com litedb e backend.
 
-## About:
-SSYNC.LiteDB aims to simplify implementing data synchronization between the frontend using LiteDB and the backend.
-
-## ⚠️ Important Notes:
-- Your local and server databases must always use: 
-    - - GUID for identifiers
-    - - Tables requiring data synchronization must include the columns: CreatedAt, UpdatedAt, and DeletedAt (timestamps).
-    - -  The DeletedAt column is a nullable datetime, meaning you will always work with soft deletes.
-    - -  The timestamp 01-01T00:00:00.0000000 (ISO) or 1/1/0001 12:00:00 AM is used as a reference to load all server data.
-    - -  Data transactions must always use consistent data formats (UTC or local), both for server and client.
-    - -  Data structure (schemas) must be consistent between server and client e keys names.
+## ⚠️ Notas importante
+- Sua base de dados local e do servidor sempre usará: 
+    - - Guid com identificadores
+    - - As tabelas que deverão realizar sincronia de dados deverão possui as seguintes colunas CreatedAt, UpdatedAt e DeletedAt? (timestamp)
+    - -  A coluna DeletedAt é datetime nulável, logo você sempre trabalhará com softdelete
+    - -  O  valor do timestamp 01-01T00:00:00.0000000 (iso) ou 1/1/0001 12:00:00 AM é usado como refência para carregar todos os dados do servidor
+    - -  Em suas transações de dados, você deverá sempre com tipo formato de dados (utc ou local), tanto para server e client
+    - -  A estrutura de dados (schemas) devem seguir a mesma para server e client
 
 
-## 🔄️ Flow
-![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
+## 🔄️ Fluxo
+![alt text](doc/notes_ssync_pt_br.png "Img Flow ssynclitedb pt-br")
 
 
 ## To update local changes:
@@ -28,21 +25,20 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
-## Flow (en=us):
-![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
+## Flow (pt-br):
+![alt text](doc/notes_ssync_pt_br.png "Img Flow ssynclitedb pt-br")
 
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
 
-### Installation
+### Como instalar
 
 
 [![Nuget](https://img.shields.io/nuget/v/SSync.Server.LitebDB)](https://www.nuget.org/packages/SSync.Server.LitebDB/)
 
 ### ⛏️ Configuração
 
-1. Set Up Your Data Models: <br/>
-Your model can inherit from ISSyncEntityRoot to automatically create the necessary columns for synchronization management.
+1. Para configuração dos seu modelo de dados você pode herdar ISSyncEntityRoot, será criado as colunas necessárias para gerencia sincronia
 
 ```cs
 // example entity from server
@@ -68,8 +64,8 @@ public class Note : ISSyncEntityRoot
 }
 ```
 
-2. Configure Data Transfer Object (DTO): <br/>
-Define a schema that represents the synchronized data object.
+2. Configurar sua modelo de classe (schema) que irá representar objeto de dados da sincronia
+
 ```cs
 // example dto to shared data
 
@@ -88,8 +84,7 @@ public class NoteSync : ISchema
 ```
 
 
-3. Configure Your DbContext:<br/>
-The DbContext must inherit from ISSyncDbContextTransaction.
+3. Configurar Dbcontext, ele deverá herdar ISSyncDbContextTransaction
 
 ```cs
 
@@ -154,8 +149,7 @@ public class PocDbContext : DbContext, ISSyncDbContextTransaction
 
 ```
 
-4. Create a Pull Handler: <br/>
-This class facilitates downloading the synchronization structure and implements the ISSyncPullRequest<ISchema, SSyncParameter> interface.
+4. Agora você deverá criar suas classe pull handler, ela irá auxiliar no download da estrutura de sicronia, ela deve Implementar da interface ISSyncPullRequest<ISchema, SSyncParameter>
 
 ```cs
 // ~/Sync.Handlers.Pull/NotePullRequestHandler.cs
@@ -195,8 +189,7 @@ public class NotePullRequestHandler : ISSyncPullRequest<NoteSync, SSyncParameter
 }
 
 ```
-5. Setup Push Handlers <br/>
-Now, create your Push Handler class to assist with CRUD operations for synchronization data structures. It must implement the interface ISSyncPushRequest<ISchema>.
+5. Agora você deverá criar suas classe push handler, ela irá auxiliar no crud de dados da estrutura de sicronia, ela deve Implementar da interface ISSyncPushRequest<ISchema>
 
 ```cs
 // ~/Sync.Handlers.Push/NotePushRequestHandler.cs
@@ -274,7 +267,7 @@ Now, create your Push Handler class to assist with CRUD operations for synchroni
 
 ```
 
-6. Setup your program.cs 
+6. Agora você deve configurar seu program.cs 
 
 
 ```cs
@@ -297,8 +290,7 @@ builder.Services.AddSSyncSchemaCollection<PocDbContext>(
 
 
 
-7. Now, you can use the ISchemaCollection interface to perform pull or push operations in your controller or endpoint.<br/>
-Here's the translated implementation for the backend:
+7. Agora você pode utilizar as interface ISchemaCollection para realizar pull ou push no seu controller ou endpoint
 
 ```cs
  // endpoint
@@ -347,8 +339,7 @@ public IAsyncEnumerable<object> PullStream([FromQuery] SSyncParameter parameter,
 
 ```
 
-8. Extend SSyncParameter to Provide Custom Parameters Available Across All Pull Handlers. <br/>
-You can inherit from the SSyncParameter class to add custom fields or additional data that will be available in all your Pull Handlers. This is useful if you need to pass additional information to your synchronization logic.
+8. Você possui a possibilidade de herdar da classe SSyncParameter e fornecer campos e dados disponivel em todo seus handlers de pull
 
 ```cs
 public class CustomParamenterSync : SSyncParameter
@@ -370,7 +361,8 @@ public class CustomParamenterSync : SSyncParameter
 ### ⛏️ Configuração
 
 
-1. Your entities must inherit from the SchemaSync class:c
+
+1. Suas entidades devem herdar da classe SchemaSync
 
 ```cs
     public class Note : SchemaSync
@@ -385,7 +377,7 @@ public class CustomParamenterSync : SSyncParameter
     }
 ```
 
-(Optional) 1.1. Table names must be unique and match your backend:
+(Opcional) 1.1. Nome das tabelas devem ser unicos e igual do seu backend
 
 ```cs
    public static class LiteDbCollection
@@ -395,8 +387,7 @@ public class CustomParamenterSync : SSyncParameter
 }
 
 ```
-2. Your data operations (CRUD) must use the Synchronize class:<br/>
-The NoteRepository class handles CRUD operations for the Note entity, ensuring that these operations are synchronized.
+2. Suas operações de dados (crud), devem ser aplicadas usando a classe Synchronize
 
 ```cs
     public class NoteRepository : INoteRepository
@@ -453,8 +444,7 @@ The NoteRepository class handles CRUD operations for the Note entity, ensuring t
 ```
 
 
-3. Create a synchronization repository class:<br/>
-The SyncRepository class is responsible for managing synchronization between the local and server databases.
+3. Agora crie sua classe repository de sincronia, ela possuirá responsabilidade de carregar dados de sua base de dados local ou enviá-las
 
 ```cs
 
@@ -510,8 +500,8 @@ public class SyncRepository : ISyncRepository
 
 ```
 
-4. Implement your synchronization service:<br/>
-The ApiService class manages the synchronization logic, communicating with the server and updating the local database.
+4. Agora implemetação do seu service de sincronia
+
 
 
 ```cs

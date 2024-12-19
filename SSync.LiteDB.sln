@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36F96630-08DF-4386-AADB-C8E121988D5B}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\publish.yaml = .github\workflows\publish.yaml
+		readme-ptBR.md = readme-ptBR.md
 		readme.md = readme.md
 	EndProjectSection
 EndProject
