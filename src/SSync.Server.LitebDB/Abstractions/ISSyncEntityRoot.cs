@@ -11,20 +11,33 @@ namespace SSync.Server.LitebDB.Abstractions
         protected ISSyncEntityRoot()
         {
             Id = Guid.NewGuid();
-            CreatedAt = DateTime.UtcNow;
-            UpdatedAt = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
+            CreatedAt = now;
+            UpdatedAt = now;
         }
         protected ISSyncEntityRoot(Time time)
         {
+            var now = DateTime.Now;
+            var nowUTC = DateTime.UtcNow;
+
             Id = Guid.NewGuid();
-            CreatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
-            UpdatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
+            CreatedAt = time == Time.LOCAL_TIME ? now : nowUTC;
+            UpdatedAt = time == Time.LOCAL_TIME ? now : nowUTC;
         }
         protected ISSyncEntityRoot(Guid id, Time time)
         {
+            var now = DateTime.Now;
+            var nowUTC = DateTime.UtcNow;
             Id = id;
-            CreatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
-            UpdatedAt = time == Time.LOCAL_TIME ? DateTime.Now : DateTime.UtcNow;
+            CreatedAt = time == Time.LOCAL_TIME ? now : nowUTC;
+            UpdatedAt = time == Time.LOCAL_TIME ? now : nowUTC;
+        }
+
+        protected ISSyncEntityRoot(Guid id, DateTime date)
+        {
+            Id = id;
+            CreatedAt = date;
+            UpdatedAt = date;
         }
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -19,8 +19,17 @@ namespace SSync.Client.LitebDB.Abstractions.Sync
         {
             Id = id;
 
-            CreateAt(time);
-            UpdateAt(time);
+            var now = time == Time.UTC ? DateTime.UtcNow.ToUniversalTime() : DateTime.Now.ToLocalTime();
+            CreatedAt = now;
+            UpdatedAt = now;
+        }
+
+        protected SchemaSync(Guid id, DateTime time) : base()
+        {
+            Id = id;
+
+            CreatedAt = time;
+            UpdatedAt = time;
         }
 
         /// <summary>
