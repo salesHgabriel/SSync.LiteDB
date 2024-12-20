@@ -1,0 +1,46 @@
+name: Build and Tests
+
+on: pull_request
+
+jobs:
+  build_teste_nuget_package:
+    name: Build and Teste SSync Client and Server
+    runs-on: ubuntu-latest
+    steps:
+    
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v2
+          with:
+            dotnet-version: 8.0.x
+
+# project ssync client
+
+        - uses: actions/checkout@v4
+  
+        - name: Restore Client
+          run: dotnet restore ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+
+        - name: Build Client
+          run: dotnet build --no-restore  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+
+
+        - name: Test Client
+          run: dotnet test --no-build --verbosity normal  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+
+
+# end project ssync client
+
+# project ssync server
+
+        - uses: actions/checkout@v4
+
+        - name: Restore Server
+          run: dotnet restore ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+
+        - name: Build Server
+          run: dotnet build --no-restore  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+
+        - name: Test Server
+          run: dotnet test --no-build --verbosity normal  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+
+# end project ssync server
