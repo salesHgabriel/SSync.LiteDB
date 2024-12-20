@@ -39,7 +39,7 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 [![Nuget](https://img.shields.io/nuget/v/SSync.Server.LitebDB)](https://www.nuget.org/packages/SSync.Server.LitebDB/)
 
-### ⛏️ Configuração
+### ⛏️ Setup
 
 1. Set Up Your Data Models: <br/>
 Your model can inherit from ISSyncEntityRoot to automatically create the necessary columns for synchronization management.
@@ -363,11 +363,11 @@ public class CustomParamenterSync : SSyncParameter
 <details open>
 <summary><h2>📱 Client</h2></summary>
 
-### Como instalar
+### Installation
 
 [![Nuget](https://img.shields.io/nuget/v/SSync.Client.LitebDB)](https://www.nuget.org/packages/SSync.Client.LitebDB/)
 
-### ⛏️ Configuração
+### ⛏️ Setup
 
 
 1. Your entities must inherit from the SchemaSync class:c
