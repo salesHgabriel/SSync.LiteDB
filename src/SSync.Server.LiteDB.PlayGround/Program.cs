@@ -1,13 +1,13 @@
+﻿using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSync.Server.LitebDB.Abstractions;
-using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Enums;
-using System.Text.Json.Nodes;
+using SSync.Server.LiteDB.PlayGround.Data;
+using SSync.Server.LiteDB.PlayGround.Model;
+using SSync.Server.LiteDB.PlayGround.Sync;
+using SSync.Server.LiteDB.PlayGround.Sync.Dto;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,16 +25,12 @@ builder.Services.AddSSyncSchemaCollection<TestDbContext>(
        .ThenBy<FinanceSync>("Finance");
 });
 
-var connectionString = builder.Configuration.GetConnectionString("SqliteConnectionString")
-     ?? "Data Source=Examples\\MyRemote.db";
 
-builder.Services.AddSqlite<TestDbContext>(connectionString);
-
-builder.Services.AddScoped(_ => new SqliteConnection(connectionString));
+builder.Services.AddDbContext<TestDbContext>(optionsBuilder => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Pooling=true;Database=poc_ssync;User Id=postgres;Password=postgres;"));
 
 var app = builder.Build();
 
-await CreateDBIfNotExistAsync(app.Services, app.Logger);
+await CreateDbIfNotExistAsync(app.Services, app.Logger);
 
 app.UseHttpsRedirection();
 
@@ -116,7 +112,7 @@ app.MapGet("/user-update/{userId}", async (Guid userId, [FromServices] TestDbCon
 {
     var now = DateTime.UtcNow;
 
-    var user = cxt.User.SingleOrDefault(u => u.Id == userId);
+    var user = cxt.User.Find(userId);
 
     if (user is null)
     {
@@ -125,7 +121,7 @@ app.MapGet("/user-update/{userId}", async (Guid userId, [FromServices] TestDbCon
 
     user.Name = $"Update {new Random().Next()}";
 
-    user.UpdatedAt = DateTime.UtcNow;
+    user.SetUpdatedAt(DateTime.UtcNow);
 
     cxt.User.Update(user);
 
@@ -138,7 +134,7 @@ app.MapGet("/finance-update/{id}", async (Guid id, [FromServices] TestDbContext 
 {
     var now = DateTime.UtcNow;
 
-    var finance = cxt.Finances.SingleOrDefault(u => u.Id == id);
+    var finance = cxt.Finances.Find(id);
 
     if (finance is null)
     {
@@ -147,7 +143,7 @@ app.MapGet("/finance-update/{id}", async (Guid id, [FromServices] TestDbContext 
 
     finance.Price = new Random().Next();
 
-    finance.UpdatedAt = DateTime.UtcNow;
+    finance.SetUpdatedAt(DateTime.UtcNow);
 
     cxt.Finances.Update(finance);
 
@@ -160,14 +156,14 @@ app.MapGet("/finance-delete/{id}", async (Guid id, TestDbContext cxt) =>
 {
     var now = DateTime.UtcNow;
 
-    var finance = cxt.Finances.SingleOrDefault(f => f.Id == id);
+    var finance = cxt.Finances.Find(id);
 
     if (finance is null)
     {
         return Results.NotFound();
     }
 
-    finance.DeletedAt = DateTime.UtcNow;
+    finance.SetDeletedAt(DateTime.UtcNow);
 
     cxt.Finances.Update(finance);
 
@@ -180,14 +176,14 @@ app.MapGet("/user-delete/{id}", async (Guid id, TestDbContext cxt) =>
 {
     var now = DateTime.UtcNow;
 
-    var user = cxt.User.SingleOrDefault(u => u.Id == id);
+    var user = cxt.User.Find(id);
 
     if (user is null)
     {
         return Results.NotFound();
     }
 
-    user.DeletedAt = DateTime.UtcNow;
+    user.SetDeletedAt(DateTime.UtcNow);
 
     cxt.User.Update(user);
 
@@ -198,188 +194,12 @@ app.MapGet("/user-delete/{id}", async (Guid id, TestDbContext cxt) =>
 
 app.Run();
 
-async Task CreateDBIfNotExistAsync(IServiceProvider services, ILogger logger)
+async Task CreateDbIfNotExistAsync(IServiceProvider services, ILogger logger)
 {
-    using var db = services.CreateScope().ServiceProvider.GetRequiredService<TestDbContext>();
+    await using var db = services.CreateScope().ServiceProvider.GetRequiredService<TestDbContext>();
     await db.Database.EnsureCreatedAsync();
     await db.Database.MigrateAsync();
 }
 
-internal class TestDbContext : DbContext, ISSyncDbContextTransaction
-{
-    private IDbContextTransaction? transaction;
 
-    public TestDbContext(DbContextOptions<TestDbContext> options)
-        : base(options) { }
-
-    public DbSet<User> User => Set<User>();
-    public DbSet<Finance> Finances => Set<Finance>();
-
-    public async Task BeginTransactionSyncAsync()
-        => transaction = await Database.BeginTransactionAsync();
-
-    public async Task CommitSyncAsync()
-        => await Database.CommitTransactionAsync();
-
-    public Task CommitTransactionSyncAsync()
-    {
-        ArgumentNullException.ThrowIfNull(transaction);
-
-        return transaction.CommitAsync();
-    }
-
-    public Task RollbackTransactionSyncAsync()
-    {
-        ArgumentNullException.ThrowIfNull(transaction);
-        return transaction.RollbackAsync();
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>()
-            .Property(u => u.Id).HasConversion(new GuidToStringConverter());
-
-        modelBuilder.Entity<Finance>()
-            .Property(u => u.Id).HasConversion(new GuidToStringConverter());
-
-        base.OnModelCreating(modelBuilder);
-    }
-}
-
-internal class User : ISSyncEntityRoot
-{
-    public string? Name { get; set; }
-
-}
-
-internal class Finance : ISSyncEntityRoot
-{
-    public double Price { get; set; }
-
-
-}
-
-internal class PlayParamenter : SSyncParameter
-{
-    public int Time { get; set; } = new Random().Next(100);
-}
-
-internal class UserSync : ISchema
-{
-    public UserSync(Guid id) : base(id)
-    {
-    }
-
-    public string? Name { get; set; }
-}
-
-internal class FinanceSync : ISchema
-{
-    public FinanceSync(Guid id) : base(id)
-    {
-    }
-
-    public double Price { get; set; }
-}
-
-internal class PullUserRequestHandler : ISSyncPullRequest<UserSync, PlayParamenter>
-{
-    private readonly TestDbContext _ctx;
-
-    public PullUserRequestHandler(TestDbContext ctx)
-    {
-        _ctx = ctx;
-    }
-
-    public async Task<IEnumerable<UserSync>> QueryAsync(PlayParamenter parameter)
-    {
-        var users = await _ctx.User.Select(u => new UserSync(u.Id)
-        {
-            Name = u.Name,
-            CreatedAt = u.CreatedAt,
-            DeletedAt = u.DeletedAt,
-            UpdatedAt = u.UpdatedAt
-        }).ToListAsync();
-
-        return users;
-    }
-}
-
-internal class PullFinanceRequestHandler : ISSyncPullRequest<FinanceSync, PlayParamenter>
-{
-    private readonly TestDbContext _ctx;
-
-    public PullFinanceRequestHandler(TestDbContext ctx)
-    {
-        _ctx = ctx;
-    }
-
-    public async Task<IEnumerable<FinanceSync>> QueryAsync(PlayParamenter parameter)
-    {
-        var finances = await _ctx.Finances.Select(u => new FinanceSync(u.Id)
-        {
-            Price = new Random().Next(100),
-            CreatedAt = u.CreatedAt,
-            DeletedAt = u.DeletedAt,
-            UpdatedAt = u.UpdatedAt
-        }).ToListAsync();
-
-        return finances;
-    }
-}
-
-internal class PushUserRequestHandler : ISSyncPushRequest<UserSync>
-{
-    private readonly TestDbContext _db;
-
-    public PushUserRequestHandler(TestDbContext db) => _db = db;
-
-    public async Task<UserSync?> FindByIdAsync(Guid id)
-    {
-        return await _db.User.Where(u => u.Id == id)
-            .Select(us => new UserSync(id)
-            {
-                Name = us.Name,
-                CreatedAt = us.CreatedAt,
-                DeletedAt = us.DeletedAt,
-                UpdatedAt = us.UpdatedAt
-            })
-        .FirstOrDefaultAsync();
-    }
-
-    public async Task<bool> CreateAsync(UserSync schema)
-    {
-        var us = new User()
-        {
-            Id = schema.Id,
-            Name = schema.Name,
-            CreatedAt = schema.CreatedAt,
-            DeletedAt = schema.DeletedAt,
-            UpdatedAt = schema.UpdatedAt
-        };
-
-        await _db.User.AddAsync(us);
-
-        return await _db.SaveChangesAsync() > 0;
-    }
-
-    public async Task<bool> UpdateAsync(UserSync schema)
-    {
-        var us = await _db.User.FindAsync(schema.Id);
-
-        us!.UpdatedAt = DateTime.Now;
-
-        us.Name = schema.Name;
-
-        return await _db.SaveChangesAsync() > 0;
-    }
-
-    public async Task<bool> DeleteAsync(UserSync schema)
-    {
-        var us = await _db.User.FindAsync(schema.Id);
-
-        us!.DeletedAt = DateTime.Now;
-
-        return await _db.SaveChangesAsync() > 0;
-    }
-}
+public partial class Program{}
