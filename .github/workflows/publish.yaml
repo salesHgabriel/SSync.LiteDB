@@ -28,7 +28,6 @@ jobs:
         - name: Build Client
           run: dotnet build --no-restore  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
-
         - name: Test Client
           run: dotnet test --no-build --verbosity normal  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
@@ -63,7 +62,6 @@ jobs:
         - name: Pack Server
           run: |
             dotnet pack ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj -c Release -o output-server
-
 
         - name: Publish Server to Nuget.Org
           run: |

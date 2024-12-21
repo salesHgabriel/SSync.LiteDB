@@ -3,8 +3,8 @@ name: Build and Tests
 on: pull_request
 
 jobs:
-  build_teste_nuget_package:
-    name: Build and Teste SSync Client and Server
+  build_tests_nuget_package:
+    name: Build and Tests SSync Client and Server
     runs-on: ubuntu-latest
     steps:
     
@@ -24,8 +24,8 @@ jobs:
           run: dotnet build --no-restore  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
 
-        - name: Test Client
-          run: dotnet test --no-build --verbosity normal  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
+        - name: Run Unit Tests Client
+          run: dotnet test --no-build --verbosity normal  ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
 
 
 # end project ssync client
@@ -40,7 +40,10 @@ jobs:
         - name: Build Server
           run: dotnet build --no-restore  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
-        - name: Test Server
-          run: dotnet test --no-build --verbosity normal  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
+        - name: Run Unit Tests Server
+          run: dotnet test --no-build --verbosity normal  ./test/SSync.Server.LitebDB.Tests/SSync.Server.LitebDB.Tests.csproj
+          
+        - name: Run Integration Tests Server
+          run: dotnet test --no-build --verbosity normal  ./test/SSync.Server.LitebDB.Integration.Tests/SSync.Server.LitebDB.Integration.Tests.csproj  
 
 # end project ssync server
