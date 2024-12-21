@@ -24,7 +24,7 @@ jobs:
           run: dotnet build --no-restore  ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj
 
         - name: teste
-          run: la -la ./test
+          run: ls -la ./test
 
         - name: Run Unit Tests Client
           run: dotnet test --no-build --verbosity normal  ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
