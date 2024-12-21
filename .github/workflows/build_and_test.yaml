@@ -13,6 +13,8 @@ jobs:
           with:
             dotnet-version: 8.0.x
 
+# project ssync client
+
         - uses: actions/checkout@v4
   
         - name: Restore Client
@@ -24,14 +26,24 @@ jobs:
         - name: Clean
           run: dotnet clean
 
-        - uses: actions/checkout@v4
+        - name: Run Unit Tests Client
+          run: dotnet test  --verbosity normal ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
+
+
+# end project ssync client
+
+# project ssync server
 
         - name: Restore Server
           run: dotnet restore ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
         - name: Build Server
           run: dotnet build --no-restore  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
-          
-        - name: Run Tests 
-          run: dotnet test --no-build
 
+        - name: Run Unit Tests Server
+          run: dotnet test --no-build --verbosity normal ./test/SSync.Server.LitebDB.Tests/SSync.Server.LitebDB.Tests.csproj
+          
+        - name: Run Integration Tests Server
+          run: dotnet test --no-build --verbosity normal ./test/SSync.Server.LitebDB.Integration.Tests/SSync.Server.LitebDB.Integration.Tests.csproj  
+
+# end project ssync server
