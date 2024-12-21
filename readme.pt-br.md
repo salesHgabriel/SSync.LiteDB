@@ -10,7 +10,94 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
     - -  A coluna DeletedAt é datetime nulável, logo você sempre trabalhará com softdelete
     - -  O  valor do timestamp 01-01T00:00:00.0000000 (iso) ou 1/1/0001 12:00:00 AM é usado como refência para carregar todos os dados do servidor
     - -  Em suas transações de dados, você deverá sempre com tipo formato de dados (utc ou local), tanto para server e client
-    - -  A estrutura de dados (schemas) devem seguir a mesma para server e client
+    - -  A estrutura de dados (schemas) devem seguir a mesma para server e client e nome da chave dos objetos
+    - - Objetos excluídos são sempre representados apenas por seus IDs.
+   - - Estrutura de json válida
+    ```json
+        [
+            {
+                collection: table1_key_name,
+                timestamp: Datetime iso like //2024-12-21T17:37:41.7618382Z ,
+                changes:{
+                    created: dtoSync[],
+                    updated: dtoSync[],
+                    deleted: string[],
+                }  
+            },
+            {
+                collection: table2_key_name,
+                timestamp: Datetime iso like //2024-12-21T17:37:41.7618382Z ,
+                changes:{
+                    created: dtoSync[],
+                    updated: dtoSync[],
+                    deleted: string[],
+                }  
+            }
+        ]
+    ``` 
+   - - Exemplo
+
+   ```json
+        [
+            {
+                "collection": "ss_tb_user",
+                "timestamp": "2024-12-21T17:37:41.7618382Z",
+                "changes": {
+                    "created": [
+                        {
+                            "name": "John Doe 45",
+                            "age": 45,
+                            "id": "a6ea4282-a3ea-4893-ba50-e11e673030ef",
+                            "createdAt": "2024-12-21T17:25:53.961871",
+                            "updatedAt": "2024-12-21T17:25:53.961871",
+                            "deletedAt": null
+                        },
+                        {
+                            "name": "John Doe 19",
+                            "age": 19,
+                            "id": "f878dac6-690a-4f5e-b929-5ebecb1cd434",
+                            "createdAt": "2024-12-21T17:25:54.689497",
+                            "updatedAt": "2024-12-21T17:25:54.689497",
+                            "deletedAt": null
+                        }
+                    ],
+                    "updated": [],
+                    "deleted": [
+                        "7897a793-6298-42e4-b1f9-bb6daa8fe948"
+                    ]
+                }
+            },
+            {
+                "collection": "ss_tb_note",
+                "timestamp": "2024-12-21T17:37:42.8157339Z",
+                "changes": {
+                    "created": [
+                        {
+                            "completed": false,
+                            "message": "new note",
+                            "userName": "John Doe 19",
+                            "id": "66c2eb1e-14f3-4ec7-8afd-84f54a42287b",
+                            "createdAt": "2024-12-21T17:26:11.350763",
+                            "updatedAt": "2024-12-21T17:26:11.350763",
+                            "deletedAt": null
+                        },
+                        {
+                            "completed": false,
+                            "message": "new note",
+                            "userName": "John Doe 19",
+                            "id": "b7c66d5b-ea12-4710-a985-436942b0e938",
+                            "createdAt": "2024-12-21T17:26:16.925801",
+                            "updatedAt": "2024-12-21T17:26:16.925801",
+                            "deletedAt": null
+                        }
+                    ],
+                    "updated": [],
+                    "deleted": []
+                }
+            }
+        ]
+   ```    
+
 
 
 ## 🔄️ Fluxo
