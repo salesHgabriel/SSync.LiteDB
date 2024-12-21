@@ -36,9 +36,9 @@ jobs:
             dotnet pack ./src/SSync.Client.LitebDB/SSync.Client.LitebDB.csproj -c Release -o output-client
 
 
-        - name: Publish Client to Nuget.Org    
-          run: |
-            dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        # - name: Publish Client to Nuget.Org    
+        #   run: |
+        #     dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
 # end project ssync client
 
@@ -63,8 +63,8 @@ jobs:
           run: |
             dotnet pack ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj -c Release -o output-server
 
-        - name: Publish Server to Nuget.Org
-          run: |
-            dotnet nuget push output-server/*.nupkg -k ${{ secrets.NUGET_API_KEY_SERVER }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        # - name: Publish Server to Nuget.Org
+        #   run: |
+        #     dotnet nuget push output-server/*.nupkg -k ${{ secrets.NUGET_API_KEY_SERVER }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
 # end project ssync server

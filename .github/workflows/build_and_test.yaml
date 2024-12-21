@@ -40,6 +40,9 @@ jobs:
         - name: Build Server
           run: dotnet build --no-restore  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
+        - name: teste
+          run: la -la ./test
+
         - name: Run Unit Tests Server
           run: dotnet test --no-build --verbosity normal  ./test/SSync.Server.LitebDB.Tests/SSync.Server.LitebDB.Tests.csproj
           
