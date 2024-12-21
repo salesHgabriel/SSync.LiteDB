@@ -27,7 +27,7 @@ jobs:
           run: dotnet clean
 
         - name: Run Unit Tests Client
-          run: dotnet test  --verbosity normal ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
+          run: dotnet test ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
 
 
 # end project ssync client
@@ -41,9 +41,9 @@ jobs:
           run: dotnet build --no-restore  ./src/SSync.Server.LitebDB/SSync.Server.LitebDB.csproj
 
         - name: Run Unit Tests Server
-          run: dotnet test --verbosity normal ./test/SSync.Server.LitebDB.Tests/SSync.Server.LitebDB.Tests.csproj
+          run: dotnet test ./test/SSync.Server.LitebDB.Tests/SSync.Server.LitebDB.Tests.csproj
           
         - name: Run Integration Tests Server
-          run: dotnet test --verbosity normal ./test/SSync.Server.LitebDB.Integration.Tests/SSync.Server.LitebDB.Integration.Tests.csproj  
+          run: dotnet test ./test/SSync.Server.LitebDB.Integration.Tests/SSync.Server.LitebDB.Integration.Tests.csproj  
 
 # end project ssync server
