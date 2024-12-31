@@ -34,8 +34,4 @@
     <ProjectReference Include="..\..\src\SSync.Server.LiteDB.PlayGround\SSync.Server.LiteDB.PlayGround.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MockServerApp\Sync\Handlers\Pull\" />
-  </ItemGroup>
-
 </Project>

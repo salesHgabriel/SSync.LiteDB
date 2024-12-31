@@ -1,6 +1,5 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions.Sync;
-using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Sync;
 using static SSync.Client.LiteDB.Tests.Sync.PullChanges_Tests;
 
@@ -119,10 +118,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
             sync.UpdateSync(user, collectionName);
 
             //assert
-
-            var changes = sync.PullChangesResult<User>(DateTime.MinValue, collectionName);
-
-            var userUpdated = changes.Changes.Updated.FirstOrDefault(u => u.Id == newUserid);
 
             Assert.True(user.Status == StatusSync.UPDATED);
         }

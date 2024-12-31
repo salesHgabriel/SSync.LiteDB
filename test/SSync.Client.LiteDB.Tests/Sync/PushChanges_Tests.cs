@@ -1,7 +1,6 @@
 ﻿using LiteDB;
 using SSync.Client.LitebDB.Abstractions.Sync;
 using SSync.Client.LitebDB.Exceptions;
-using SSync.Client.LitebDB.Extensions;
 using SSync.Client.LitebDB.Poco;
 using SSync.Client.LitebDB.Sync;
 
@@ -14,16 +13,13 @@ namespace SSync.Client.LiteDB.Tests.Sync
         public void SetDatabaseLiteDbNull_SchoudReturnPushChangesExceptions()
         {
             //arrange
-            var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow}";
-
-            var now = DateTime.Now;
+            LiteDatabase? initializationDb = null;
 
             //act
 
-            var sync = new Synchronize(null!);
+            var sync = new Synchronize(initializationDb!);
 
-            Action act = () => sync.PushChangesResult(new LitebDB.Poco.SchemaPush<User>());
+            Action act = () => sync.PushChangesResult(new SchemaPush<User>());
 
             //assert
             PushChangeException exception = Assert.Throws<PushChangeException>(act);
@@ -35,10 +31,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         public void SetSchemaChangeNull_SchoudReturnPushChangesExceptions()
         {
             //arrange
-            var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow}";
-
-            var now = DateTime.Now;
+            SchemaPush<User>? dtoSchema = null;
 
             //act
 
@@ -46,7 +39,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(database);
 
-            Action act = () => sync.PushChangesResult((SchemaPush<User>)null!);
+            Action act = () => sync.PushChangesResult(dtoSchema!);
 
             //assert
             ArgumentNullException exception = Assert.Throws<ArgumentNullException>(act);
@@ -59,7 +52,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             var colUserName = "user";
 
-            var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
+            var users = Enumerable.Range(0, 4).Select(_ => new User(Guid.NewGuid())
             {
                 Name = $"Cotoso {DateTime.UtcNow}"
             }).ToArray();
