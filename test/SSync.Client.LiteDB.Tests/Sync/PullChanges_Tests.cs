@@ -12,12 +12,8 @@ namespace SSync.Client.LiteDB.Tests.Sync
         public void SetDatabaseLiteDbNull_SchoudReturnPullChangesExceptions()
         {
             //arrange
-            var newUserid = Guid.NewGuid();
-            var newUserName = $"Cotoso {DateTime.UtcNow}";
-
-            var lastPulledAt = DateTime.MinValue;
+  var lastPulledAt = DateTime.MinValue;
             var collectionName = "user";
-            var now = DateTime.Now;
 
             //act
 
@@ -40,7 +36,6 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var lastPulledAt = DateTime.MinValue;
             var collectionName = "user";
-            var now = DateTime.Now;
 
             using var database = new LiteDatabase(new MemoryStream());
 
@@ -66,7 +61,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
         {
             var colUserName = "user";
 
-            var users = Enumerable.Range(0, 4).Select(u => new User(Guid.NewGuid())
+            var users = Enumerable.Range(0, 4).Select(_ => new User(Guid.NewGuid())
             {
                 Name = $"Cotoso {DateTime.UtcNow}"
             }).ToArray();
