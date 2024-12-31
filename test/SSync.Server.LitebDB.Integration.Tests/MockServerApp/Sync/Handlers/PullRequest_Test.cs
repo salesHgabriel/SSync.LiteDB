@@ -20,8 +20,6 @@ namespace SSync.Server.LitebDB.Integration.Tests.MockServerApp.Sync.Handlers
         {
             ArgumentNullException.ThrowIfNull(integrationFixture.Client);
         }
-
-        //pull all test -> expected all register created and update and deleted empty ✅
         
         [Fact]
         public async Task SetTimestamp_To_PullAllChanges_Should_Return_Only_Created_Values()
@@ -47,9 +45,6 @@ namespace SSync.Server.LitebDB.Integration.Tests.MockServerApp.Sync.Handlers
             Assert.False(usersChanges.HasDeleted);
         }
         
-        
-        //pull date current with data -> expect some data create ✅
-
         [Fact]
         public async Task Set_Current_Timestamp_To_PullChanges_Should_Return_Value_From_Current_DateTime()
         {
