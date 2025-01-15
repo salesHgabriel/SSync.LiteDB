@@ -112,9 +112,6 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
-## Flow (pt-br):
-![alt text](doc/notes_ssync_pt_br.png "Img Flow ssynclitedb pt-br")
-
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
 

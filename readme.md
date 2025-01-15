@@ -115,8 +115,6 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
-## Flow (en=us):
-![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
 
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
