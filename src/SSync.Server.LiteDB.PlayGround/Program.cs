@@ -40,7 +40,7 @@ app.MapApiEndpointsSync<PlayParamenter>();
 
 //custom endpoints
 
-// app.MapGet("/pull", async ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+// app.MapGet("/api/v1/sync/pull", async ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
 // {
 //     var pullChangesRemoter = await schemaCollection.PullChangesAsync(parameter, new SSyncOptions()
 //     {
@@ -50,7 +50,7 @@ app.MapApiEndpointsSync<PlayParamenter>();
 //     return Results.Ok(pullChangesRemoter);
 // });
 //
-// app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
+// app.MapPost("/api/v1/sync/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
 // {
 //     var query = httpContext.Request.Query;
 //
@@ -69,7 +69,7 @@ app.MapApiEndpointsSync<PlayParamenter>();
 //     return Results.Ok(isOk);
 // });
 
-// app.MapGet("/pull-stream", ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+// app.MapGet("/api/v1/sync/pull-stream", ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
 // {
 //     var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
 //     {

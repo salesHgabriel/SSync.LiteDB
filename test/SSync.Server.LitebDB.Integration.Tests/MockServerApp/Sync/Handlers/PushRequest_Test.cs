@@ -43,7 +43,7 @@ public class PushRequest_Test : IntegrationTest
         var content = new StringContent(jsonChangesFromClient, Encoding.UTF8, "application/json");
 
         var pullResult =
-            await Client.PostAsync($"/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
+            await Client.PostAsync($"/api/v1/sync/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
         Assert.True(pullResult.IsSuccessStatusCode);
 
         var user = DbContext.User.FirstOrDefault(u => u.Id == Guid.Parse("1851d7ed-ea2b-4b17-8e77-ab6fb2cb8f81"));
@@ -107,7 +107,7 @@ public class PushRequest_Test : IntegrationTest
         var content = new StringContent(jsonChangesFromClient, Encoding.UTF8, "application/json");
 
         var pullResult =
-            await Client.PostAsync($"/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
+            await Client.PostAsync($"/api/v1/sync/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
         Assert.True(pullResult.IsSuccessStatusCode);
 
         DbContext.ChangeTracker.Clear();
@@ -163,7 +163,7 @@ public class PushRequest_Test : IntegrationTest
         var content = new StringContent(jsonChangesFromClient, Encoding.UTF8, "application/json");
 
         var pullResult =
-            await Client.PostAsync($"/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
+            await Client.PostAsync($"/api/v1/sync/push?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", content);
         Assert.True(pullResult.IsSuccessStatusCode);
 
         DbContext.ChangeTracker.Clear();
