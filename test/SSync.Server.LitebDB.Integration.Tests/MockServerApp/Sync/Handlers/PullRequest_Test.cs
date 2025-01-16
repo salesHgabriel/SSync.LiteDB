@@ -28,7 +28,7 @@ namespace SSync.Server.LitebDB.Integration.Tests.MockServerApp.Sync.Handlers
 
             Assert.True(createResult.IsSuccessStatusCode);
             
-            var pullResult = await Client.GetAsync($"/pull?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", CancellationToken.None);
+            var pullResult = await Client.GetAsync($"/api/v1/sync/pull?Time=0&Colletions=User&Timestamp={DateTime.MinValue:o}", CancellationToken.None);
             Assert.True(pullResult.IsSuccessStatusCode);
              
             var content = await pullResult.Content.ReadAsStringAsync();
@@ -54,7 +54,7 @@ namespace SSync.Server.LitebDB.Integration.Tests.MockServerApp.Sync.Handlers
 
             Assert.True(createResult.IsSuccessStatusCode);
 
-            var pullResult = await Client.GetAsync($"/pull?Time=0&Colletions=User&Timestamp={currentTime:o}", CancellationToken.None);
+            var pullResult = await Client.GetAsync($"/api/v1/sync/pull?Time=0&Colletions=User&Timestamp={currentTime:o}", CancellationToken.None);
             Assert.True(pullResult.IsSuccessStatusCode);
              
             var content = await pullResult.Content.ReadAsStringAsync();

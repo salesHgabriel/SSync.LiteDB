@@ -112,9 +112,6 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
-## Flow (pt-br):
-![alt text](doc/notes_ssync_pt_br.png "Img Flow ssynclitedb pt-br")
-
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
 
@@ -377,6 +374,7 @@ builder.Services.AddSSyncSchemaCollection<PocDbContext>(
 
 
 
+
 7. Agora você pode utilizar as interface ISchemaCollection para realizar pull ou push no seu controller ou endpoint
 
 ```cs
@@ -436,6 +434,16 @@ public class CustomParamenterSync : SSyncParameter
 }
 
 ```
+
+
+9. (opcional) Caso não queira criar endpoint de pull e push manualmente, você pode chamada função MapApiEndpointsSync, é  obrigatório passar um tipo customizado que herda de SSyncParameter, 
+assim que irá injectar automaticamente endpoints para realizar as operações
+
+```cs
+app.MapApiEndpointsSync<CustomParamenterSync>();
+```
+
+
 </details>
 
 <details open>

@@ -115,8 +115,6 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
-## Flow (en=us):
-![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
 
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
@@ -443,8 +441,15 @@ public class CustomParamenterSync : SSyncParameter
     public Guid? UserId { get; set; }
     public string? phoneId { get; set; }
 }
-
 ```
+
+9. (optional) If you do not want to manually create pull and push endpoints, you can call the MapApiEndpointsSync function. 
+   It is mandatory to provide a custom type that inherits from SSyncParameter, as this will automatically inject endpoints to perform the operations.
+
+```cs
+app.MapApiEndpointsSync<CustomParamenterSync>();
+```
+
 </details>
 
 <details open>
