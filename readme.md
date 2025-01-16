@@ -441,8 +441,15 @@ public class CustomParamenterSync : SSyncParameter
     public Guid? UserId { get; set; }
     public string? phoneId { get; set; }
 }
-
 ```
+
+9. (optional) If you do not want to manually create pull and push endpoints, you can call the MapApiEndpointsSync function. 
+   It is mandatory to provide a custom type that inherits from SSyncParameter, as this will automatically inject endpoints to perform the operations.
+
+```cs
+app.MapApiEndpointsSync<CustomParamenterSync>();
+```
+
 </details>
 
 <details open>
