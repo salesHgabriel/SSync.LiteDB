@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Engine;
 using SSync.Server.LitebDB.Enums;
+using SSync.Server.LitebDB.Extensions;
 using SSync.Server.LiteDB.PlayGround.Data;
 using SSync.Server.LiteDB.PlayGround.Model;
 using SSync.Server.LiteDB.PlayGround.Sync;
@@ -34,44 +35,49 @@ await CreateDbIfNotExistAsync(app.Services, app.Logger);
 
 app.UseHttpsRedirection();
 
-app.MapGet("/pull", async ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
-{
-    var pullChangesRemoter = await schemaCollection.PullChangesAsync(parameter, new SSyncOptions()
-    {
-        Mode = Mode.DEBUG
-    });
+app.MapApiEndpointsSync<PlayParamenter>();
 
-    return Results.Ok(pullChangesRemoter);
-});
 
-app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
-{
-    var query = httpContext.Request.Query;
+//custom endpoints
 
-    var parameter = new PlayParamenter
-    {
-        Time = Convert.ToInt32(query["time"]),
-        Colletions = query["colletions"].ToArray()!,
-        Timestamp = DateTime.TryParse(query["timestamp"], out DateTime timestamp) ? timestamp : DateTime.MinValue
-    };
+// app.MapGet("/pull", async ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+// {
+//     var pullChangesRemoter = await schemaCollection.PullChangesAsync(parameter, new SSyncOptions()
+//     {
+//         Mode = Mode.DEBUG
+//     });
+//
+//     return Results.Ok(pullChangesRemoter);
+// });
+//
+// app.MapPost("/push", async (HttpContext httpContext, JsonArray changes, [FromServices] ISchemaCollection schemaCollection) =>
+// {
+//     var query = httpContext.Request.Query;
+//
+//     var parameter = new SSyncParameter
+//     {
+//         // Time = Convert.ToInt32(query["time"]),
+//         Colletions = query["colletions"].ToArray()!,
+//         Timestamp = DateTime.TryParse(query["timestamp"], out DateTime timestamp) ? timestamp : DateTime.MinValue
+//     };
+//
+//     var isOk = await schemaCollection.PushChangesAsync(changes, parameter, new SSyncOptions()
+//     {
+//         Mode = Mode.DEBUG
+//     });
+//
+//     return Results.Ok(isOk);
+// });
 
-    var isOk = await schemaCollection.PushChangesAsync(changes, parameter, new SSyncOptions()
-    {
-        Mode = Mode.DEBUG
-    });
-
-    return Results.Ok(isOk);
-});
-
-app.MapGet("/pull-stream", ([AsParameters] PlayParamenter parameter, [FromServices] ISchemaCollection schemaCollection) =>
-{
-    var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
-    {
-        Mode = Mode.DEBUG
-    });
-
-    return Results.Ok(pullChangesRemoter);
-});
+// app.MapGet("/pull-stream", ([AsParameters] SSyncParameter parameter, [FromServices] ISchemaCollection schemaCollection) =>
+// {
+//     var pullChangesRemoter = schemaCollection.PullStreamChanges(parameter, new SSyncOptions()
+//     {
+//         Mode = Mode.DEBUG
+//     });
+//
+//     return Results.Ok(pullChangesRemoter);
+// });
 
 
 app.MapGet("/list", async ([FromServices] TestDbContext cxt) =>
