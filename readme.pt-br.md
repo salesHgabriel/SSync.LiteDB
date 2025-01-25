@@ -98,6 +98,12 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
         ]
    ```    
 
+## 📽️ YouTube
+[![Demostração](https://img.shields.io/badge/Demostração-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=dSAaEAqkMZY?si=zPHq9BhFZ2Usju81)
+[![Configuração do servidor](https://img.shields.io/badge/Configuração_do_servidor-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=DqrYprDl0H2ebjZ2)
+[![Configuração do cliente](https://img.shields.io/badge/Configuração_do_cliente-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=Fr49m1ocRK0iDmlv)
+[![Como realizar upload documentos](https://img.shields.io/badge/Como_realizar_upload_documentos-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=Fr49m1ocRK0iDmlv)
+
 
 
 ## 🔄️ Fluxo
