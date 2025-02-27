@@ -4,7 +4,7 @@
 [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/salesHgabriel/SSync.LiteDB/blob/master/readme.pt-br.md)
 
 ## About:
-SSYNC.LiteDB aims to simplify implementing data synchronization between the frontend using LiteDB and the backend.
+SSYNC.LiteDB aims to simplify implementing data synchronization between the frontend using LiteDB or SQLite and the backend.
 
 ## ⚠️ Important Notes:
 - Your local and server databases must always use: 
@@ -101,6 +101,11 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
         ]
    ```    
 
+- ## 📽️ YouTube (pt_BR)
+[![Demo](https://img.shields.io/badge/Demo-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=dSAaEAqkMZY?si=zPHq9BhFZ2Usju81)
+[![Setup Server](https://img.shields.io/badge/Setup_Server-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=DqrYprDl0H2ebjZ2)
+[![Setup Frontend](https://img.shields.io/badge/Setup_Client-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=Fr49m1ocRK0iDmlv)
+[![How Make upload docs](https://img.shields.io/badge/How_Make_Upload_Docs-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=Fr49m1ocRK0iDmlv)
 
 
 ## 🔄️ Flow
@@ -115,6 +120,30 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
+- ## ✍🏻 Repos with examples 
+[![All examples with LiteDB](https://img.shields.io/badge/All_Examples_With_LiteDB-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync)
+
+[![All examples with SQLite](https://img.shields.io/badge/All_Examples_With_SQLite-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync/tree/example-sqlite)
+
+
+Currently supports:
+
+* Server: ASP.NET 8
+* Client: .NET 8
+
+Client Platforms:
+
+* [Avalonia UI](https://www.avaloniaui.net/)
+* [.NET MAUI](https://dotnet.microsoft.com/apps/maui)
+* [Uno Platform](https://platform.uno/)
+
+## 📦 NuGet Packages
+
+| Package | Type 
+|---------|---------
+| [SSync.Client.LitebDB](https://www.nuget.org/packages/SSync.Client.LitebDB) | Client
+| [SSync.Client.SQLite](SSync.Client.SQLite) | Client 
+| [SSync.Server.LitebDB](https://www.nuget.org/packages/SSync.Server.LitebDB) | Server
 
 <details open>
 <summary><h2>🔙 Backend</h2></summary>
@@ -462,12 +491,12 @@ app.MapApiEndpointsSync<CustomParamenterSync>();
 ### ⛏️ Setup
 
 
-1. Your entities must inherit from the SchemaSync class:c
+1. Your entities must inherit from the SchemaSync class
 
 ```cs
     public class Note : SchemaSync
     {
-        public Note(Guid id) : base(id, SSync.Client.LitebDB.Enums.Time.UTC)
+        public Note(Guid id) : base(id, Time.UTC)
         {
         }
 
@@ -476,6 +505,9 @@ app.MapApiEndpointsSync<CustomParamenterSync>();
         public bool Completed { get; set; }
     }
 ```
+
+
+
 
 (Optional) 1.1. Table names must be unique and match your backend:
 
@@ -490,57 +522,140 @@ app.MapApiEndpointsSync<CustomParamenterSync>();
 2. Your data operations (CRUD) must use the Synchronize class:<br/>
 The NoteRepository class handles CRUD operations for the Note entity, ensuring that these operations are synchronized.
 
+<b>In LiteDB</b>:
 ```cs
-    public class NoteRepository : INoteRepository
+public class NoteRepo : INoteRepo
+{
+ 
+    public List<Note> GetNotes()
     {
-        private Synchronize? _sync;
-        private readonly LiteDatabase? _db;
-
-        public NoteRepository()
-        {
-            _db = new LiteDatabase(GetPath());
-            _sync = new Synchronize(_db);
-        }
-
-        public List<Note> GetAll()
-        {
-            return _db!.GetCollection<Note>().FindAll().OrderBy(s => s.CreatedAt).ToList();
-        }
-
-        public Task Save(Note note)
-        {
-            _sync!.InsertSync(note,"Note");
-
-            return Task.CompletedTask;
-        }
-
-        public Task Update(Note note)
-        {
-            _sync!.UpdateSync(note, "Note");
-
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(Note note)
-        {
-            _sync!.DeleteSync(note, "Note");
-            return Task.CompletedTask;
-        }
-
-
-        private string GetPath()
-        {
-            var path = FileSystem.Current.AppDataDirectory;
-
-#if WINDOWS
-            return Path.Combine(path, "litedbwin.db");
-#else
-            return Path.Combine(path, "litedb.db");
-#endif
-        }
-
-
+        using var db = new LiteDatabase(Database.GetPath());
+        return db!
+            .GetCollection<Note>(Note.CollectionName)
+            .FindAll()
+            .OrderByDescending(u => u.CreatedAt)
+            .ToList();
     }
+
+    public Note GetNoteBydId(Guid id)
+    {
+        using var db = new LiteDatabase(Database.GetPath());
+        return db!
+            .GetCollection<Note>(Note.CollectionName)
+            .FindById(id);
+    }
+
+    public Task Save(Note entity)
+    {
+        using var db = new LiteDatabase(Database.GetPath());
+        var sync = new Synchronize(db);
+        sync!.InsertSync(entity, Note.CollectionName);
+
+        return Task.CompletedTask;
+    }
+
+    public Task Update(Note entity)
+    {
+        using var db = new LiteDatabase(Database.GetPath());
+        var sync = new Synchronize(db);
+        sync!.UpdateSync(entity, Note.CollectionName);
+
+        return Task.CompletedTask;
+    }
+
+
+    public Task Delete(Note entity)
+    {
+        using var db = new LiteDatabase(Database.GetPath());
+        var sync = new Synchronize(db);
+        sync!.DeleteSync(entity, Note.CollectionName);
+
+        return Task.CompletedTask;
+    }
+
+
+    public Task Drop()
+    {
+        using var db = new LiteDatabase(Database.GetPath());
+
+        db!.GetCollection<Note>().DeleteAll();
+        return Task.CompletedTask;
+    }
+
+}
+
+```
+
+<b>In SQLite</b>:
+```cs
+    public class NoteRepo : INoteRepo
+    {
+        SQLiteAsyncConnection? Db;
+
+        async Task Init()
+        {
+            if (Db is not null)
+                return;
+
+            Db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            var result = await Db.CreateTableAsync<Note>();
+        }
+
+        public async Task<List<Note>> GetNotes()
+        {
+            await Init();
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            return await db!
+                .Table<Note>()
+                .OrderByDescending(u => u.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Note> GetNoteBydId(Guid id)
+        {
+            await Init();
+
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            return await db!
+                .Table<Note>()
+                .FirstAsync(e => e.Id.Equals(id));
+        }
+
+        public async Task Save(Note entity)
+        {
+            await Init();
+
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            var sync = new Synchronize(db);
+            await sync!.InsertSyncAsync(entity);
+        }
+
+        public async Task Update(Note entity)
+        {
+            await Init();
+
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            var sync = new Synchronize(db);
+            await sync!.UpdateSyncAsync(entity);
+        }
+
+        public async Task Delete(Note entity)
+        {
+            await Init();
+
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            var sync = new Synchronize(db);
+            await sync!.DeleteSyncAsync(entity);
+        }
+
+        public async Task Drop()
+        {
+            await Init();
+
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+
+            await db!.DeleteAllAsync<Note>();
+        }
 
 ```
 
@@ -548,85 +663,133 @@ The NoteRepository class handles CRUD operations for the Note entity, ensuring t
 3. Create a synchronization repository class:<br/>
 The SyncRepository class is responsible for managing synchronization between the local and server databases.
 
+<b>In LiteDB</b>:
 ```cs
-
-
-public class SyncRepository : ISyncRepository
+    public class SyncRepository : ISyncRepository
     {
-        //send database local to server
         public string PullLocalChangesToServer(DateTime lastPulledAt)
         {
+            using var db = new LiteDatabase(Database.GetPath());
+            using var sync = new Synchronize(db);
+
             var pullChangesBuilder = new SyncPullBuilder();
 
-            var last = _sync!.GetLastPulledAt();
+            var last = sync!.GetLastPulledAt();
+
             pullChangesBuilder
-                .AddPullSync(() => _sync!.PullChangesResult<Note>(last, LiteDbCollection.Note))
-                // if more table to get  
-                .AddPullSync(() => _sync!.PullChangesResult<AnotherTable>(last, LiteDbCollection.AnotherTable))
+                .AddPullSync(() => sync!.PullChangesResult<User>(last, User.CollectionName))
+                .AddPullSync(() => sync!.PullChangesResult<Note>(last, Note.CollectionName))
+                .AddPullSync(() => sync!.PullChangesResult<Doc>(last, Doc.CollectionName))
                 .Build();
 
             var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
             var jsonDatabaseLocal = pullChangesBuilder.JsonDatabaseLocalChanges;
 
-            return jsonDatabaseLocal;
+            db.Dispose();
+
+            return jsonDatabaseLocal!;
         }
 
         //Load database server to my local
         public Task PushServerChangesToLocal(string jsonServerChanges)
         {
+            using var db = new LiteDatabase(Database.GetPath());
+            using var sync = new Synchronize(db);
+
             var pushBuilder = new SyncPushBuilder(jsonServerChanges);
 
             pushBuilder
-                .AddPushSchemaSync<Note>(change => _sync!.PushChangesResult(change), LiteDbCollection.Note)
-                   // if more table to send  
-                .AddPullSync(() => _sync!.PullChangesResult<AnotherTable>(last, LiteDbCollection.AnotherTable))
+                .AddPushSchemaSync<User>(change => sync!.PushChangesResult(change), User.CollectionName)
+                .AddPushSchemaSync<Note>(change => sync!.PushChangesResult(change), Note.CollectionName)
                 .Build();
 
+            db.Dispose();
+
             return Task.CompletedTask;
         }
-
-        // save last date did changes
-        public Task SetLastPulledAt(DateTime lastPulledAt)
-        {
-           _sync!.ReplaceLastPulledAt(lastPulledAt);
-            return Task.CompletedTask;
-        }
-
-        // get last date did changes
-        public DateTime GetLastPulledAt()
-        {
-            return _sync!.GetLastPulledAt();
-        }
-
     }
 
 ```
 
+<b>In SQLite</b>:
+
+```cs
+    public class SyncRepository : ISyncRepository
+    {
+        public async Task<string> PullLocalChangesToServer(DateTime lastPulledAt)
+        {
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            using var sync = new Synchronize(db);
+
+            var pullChangesBuilder = new SyncPullBuilder();
+
+            var last = await sync!.GetLastPulledAtAsync();
+
+           await pullChangesBuilder
+                .AddPullSync(() => sync!.PullChangesResultAsync<User>(last, User.CollectionName))
+                .AddPullSync(() => sync!.PullChangesResultAsync<Note>(last, Note.CollectionName))
+                .AddPullSync(() => sync!.PullChangesResultAsync<Doc>(last, Doc.CollectionName))
+                .BuildAsync();
+
+            var databaseLocal = pullChangesBuilder.DatabaseLocalChanges;
+            var jsonDatabaseLocal = pullChangesBuilder.JsonDatabaseLocalChanges;
+
+         
+
+            return jsonDatabaseLocal!;
+        }
+
+        //Load database server to my local
+        public async Task PushServerChangesToLocal(string jsonServerChanges)
+        {
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            using var sync = new Synchronize(db);
+
+            var pushBuilder = new SyncPushBuilder(jsonServerChanges);
+
+            await pushBuilder
+                .AddPushSchemaSync<User>(sync!.PushChangesResultAsync, User.CollectionName)
+                .AddPushSchemaSync<Note>(sync!.PushChangesResultAsync, Note.CollectionName)
+                .BuildAsync();
+        }
+    }
+```
+
+
 4. Implement your synchronization service:<br/>
-The ApiService class manages the synchronization logic, communicating with the server and updating the local database.
+The ApiService class manages the synchronization logic, communicating with the server and updating the local database.<br/>
+The example how show you upload docs to server.
 
-
+<b>In LiteDB</b>:
 ```cs
 
     public class ApiService : IApiService
     {
-        private readonly SyncRepository _syncService;
+        private readonly ISyncRepository _syncRepository;
 
-        public ApiService(SyncRepository syncService)
+        public ApiService(ISyncRepository syncRepository)
         {
-            _syncService = syncService;
+            _syncRepository = syncRepository;
         }
 
-        public async Task<int> PushServer()
+        public async Task<DateTime> PushServerAsync()
         {
+            using var db = new LiteDatabase(Database.GetPath());
+            using var sync = new Synchronize(db);
             //get local database
-            var time = _syncService.GetLastPulledAt();
-            var localDatabaseChanges = _syncService.PullLocalChangesToServer(time);
+            var time = sync.GetLastPulledAt();
+            db.Dispose();
+            var localDatabaseChanges = _syncRepository.PullLocalChangesToServer(time);
+
+            Guid? userIdLogged = null; //get id user logged for example
 
             //send local database to server
-            var result = await "https://api-backend.com"
+            var result = await EndPoint.BaseURL
                 .AppendPathSegment("api/Sync/Push")
-                .AppendQueryParam("Colletions", LiteDbCollection.Note)
+                .AppendQueryParam("Collections", User.CollectionName)
+                .AppendQueryParam("Collections", Note.CollectionName)
+                .AppendQueryParam("Collections", Doc.CollectionName)
+                .AppendQueryParam("UserId", userIdLogged)
                 .AppendQueryParam("Timestamp", time)
                 .WithHeader("Accept", "application/json")
                 .WithHeader("Content-type", "application/json")
@@ -634,34 +797,276 @@ The ApiService class manages the synchronization logic, communicating with the s
 
             var resp = await result.ResponseMessage.Content.ReadAsStringAsync();
 
-            var dta = JsonSerializer.Deserialize<DateTimeOffset>(resp);
-            await _syncService.SetLastPulledAt(dta.Date);
+            var dta = System.Text.Json.JsonSerializer.Deserialize<DateTimeOffset>(resp);
+            sync.ReplaceLastPulledAt(dta.Date);
 
-            return result.StatusCode;
+            return time;
         }
 
-        public async Task PullServer(bool all)
+        // call method after push sync data, to use same timestamp of sync data
+        public async Task<List<Doc>> PushDocsToServerAsync(DateTime timestamp)
         {
+            using var db = new LiteDatabase(Database.GetPath());
+
+            using var sync = new Synchronize(db);
+
+            var synDocs = sync!.PullChangesResult<Doc>(timestamp, Doc.CollectionName);
+
+            var allDocToUpload = new List<Doc>();
+
+            var docsCreated = synDocs.Changes.Created.Select(sdc => new Doc()
+            {
+                Id = sdc.Id,
+                Path = sdc.Path,
+                Status = sdc.Status,
+                CreatedAt = sdc.CreatedAt,
+                UpdatedAt = sdc.UpdatedAt,
+                Name = sdc.Name,
+                FileName = sdc.FileName,
+                DeletedAt = sdc.DeletedAt,
+            });
+
+            var docsUpdate = synDocs.Changes.Updated.Select(sdc => new Doc()
+            {
+                Id = sdc.Id,
+                Path = sdc.Path,
+                Status = sdc.Status,
+                CreatedAt = sdc.CreatedAt,
+                UpdatedAt = sdc.UpdatedAt,
+                Name = sdc.Name,
+                FileName = sdc.FileName,
+                DeletedAt = sdc.DeletedAt,
+            });
+
+
+            allDocToUpload.AddRange(docsCreated);
+
+            allDocToUpload.AddRange(docsUpdate);
+
+
+            var allDocToUploadError = new List<Doc>();
+
+
+            foreach (var doc in allDocToUpload)
+            {
+                using var form = new MultipartFormDataContent();
+                
+                var fileStream = File.OpenRead(doc.Path);
+                var fileContent = new StreamContent(fileStream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                form.Add(fileContent, "files", Path.GetFileName(doc.Path));
+                
+                //send files to server
+                var result = await EndPoint.BaseURL
+                    .AppendPathSegment("api/Sync/doc-up")
+                    .AppendQueryParam("DocId", doc.Id)
+                    .PostMultipartAsync(mp => mp
+                        .AddFile("file1", doc.Path, "application/octet-stream")                    // local file path
+                        // .AddFile("file2", stream, "foo.txt")
+                    );
+
+                var resp = await result.ResponseMessage.Content.ReadAsStringAsync();
+
+                if (result.StatusCode != 200)
+                {
+                    allDocToUploadError.Add(doc);
+                }
+            }
+
+            return allDocToUploadError;
+        }
+
+
+        public async Task PullServerAsync(bool all)
+        {
+            using var db = new LiteDatabase(Database.GetPath());
+            using var sync = new Synchronize(db);
+
             // get server database
-            var time = all ? DateTime.MinValue : _syncService.GetLastPulledAt();
-            var result = await "https://api-backend.com"
-            .AppendPathSegment("api/Sync/Pull")
-            .AppendQueryParam("Colletions", LiteDbCollection.Note)
-            .AppendQueryParam("Timestamp", time.ToString("o"))
-            .GetAsync();
+            var time = all ? DateTime.MinValue : sync.GetLastPulledAt();
+            var result = await EndPoint.BaseURL
+                .AppendPathSegment("api/Sync/Pull")
+                .AppendQueryParam("Colletions", User.CollectionName)
+                .AppendQueryParam("Colletions", Note.CollectionName)
+                .AppendQueryParam("Timestamp", time.ToString("o"))
+                .GetAsync();
+
+            var res = await result.ResponseMessage.Content.ReadAsStringAsync();
+
+            db.Dispose();
+
+            //update local database from server
+
+            await _syncRepository.PushServerChangesToLocal(res);
+        }
+    }
+
+```
+
+<b>In SQLite</b>:
+
+```cs
+    public class ApiService : IApiService
+    {
+        private readonly ISyncRepository _syncRepository;
+
+        public ApiService(ISyncRepository syncRepository)
+        {
+            _syncRepository = syncRepository;
+        }
+
+        public async Task<DateTime> PushServerAsync()
+        {
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+            using var sync = new Synchronize(db);
+            //get local database
+            var time = await sync.GetLastPulledAtAsync();
+
+            var localDatabaseChanges = await _syncRepository.PullLocalChangesToServer(time);
+
+            Guid? userIdLogged = null; //get id user logged for example
+
+            //send local database to server
+            var result = await EndPoint.BaseURL
+                .AppendPathSegment("api/Sync/Push")
+                .AppendQueryParam("Collections", User.CollectionName)
+                .AppendQueryParam("Collections", Note.CollectionName)
+                .AppendQueryParam("Collections", Doc.CollectionName)
+                .AppendQueryParam("UserId", userIdLogged)
+                .AppendQueryParam("Timestamp", time)
+                .WithHeader("Accept", "application/json")
+                .WithHeader("Content-type", "application/json")
+                .PostStringAsync(localDatabaseChanges);
+
+            var resp = await result.ResponseMessage.Content.ReadAsStringAsync();
+
+            var dta = System.Text.Json.JsonSerializer.Deserialize<DateTimeOffset>(resp);
+
+           await sync.ReplaceLastPulledAtAsync(dta.Date);
+
+            return time;
+        }
+
+        // call method after push sync data, to use same timestamp of sync data
+        public async Task<List<Doc>> PushDocsToServerAsync(DateTime timestamp)
+        {
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags);
+
+            using var sync = new Synchronize(db);
+
+            var synDocs = await sync!.PullChangesResultAsync<Doc>(timestamp, Doc.CollectionName);
+
+            var allDocToUpload = new List<Doc>();
+
+            var docsCreated = synDocs.Changes.Created.Select(sdc => new Doc()
+            {
+                Id = sdc.Id,
+                Path = sdc.Path,
+                Status = sdc.Status,
+                CreatedAt = sdc.CreatedAt,
+                UpdatedAt = sdc.UpdatedAt,
+                Name = sdc.Name,
+                FileName = sdc.FileName,
+                DeletedAt = sdc.DeletedAt,
+            });
+
+            var docsUpdate = synDocs.Changes.Updated.Select(sdc => new Doc()
+            {
+                Id = sdc.Id,
+                Path = sdc.Path,
+                Status = sdc.Status,
+                CreatedAt = sdc.CreatedAt,
+                UpdatedAt = sdc.UpdatedAt,
+                Name = sdc.Name,
+                FileName = sdc.FileName,
+                DeletedAt = sdc.DeletedAt,
+            });
+
+
+            allDocToUpload.AddRange(docsCreated);
+
+            allDocToUpload.AddRange(docsUpdate);
+
+
+            var allDocToUploadError = new List<Doc>();
+
+
+            foreach (var doc in allDocToUpload)
+            {
+                using var form = new MultipartFormDataContent();
+                
+                var fileStream = File.OpenRead(doc.Path!);
+                var fileContent = new StreamContent(fileStream);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                form.Add(fileContent, "files", Path.GetFileName(doc.Path)!);
+                
+                //send files to server
+                var result = await EndPoint.BaseURL
+                    .AppendPathSegment("api/Sync/doc-up")
+                    .AppendQueryParam("DocId", doc.Id)
+                    .PostMultipartAsync(mp => mp
+                        .AddFile("file1", doc.Path, "application/octet-stream")                    // local file path
+                        // .AddFile("file2", stream, "foo.txt")
+                    );
+
+                var resp = await result.ResponseMessage.Content.ReadAsStringAsync();
+
+                if (result.StatusCode != 200)
+                {
+                    allDocToUploadError.Add(doc);
+                }
+            }
+
+            return allDocToUploadError;
+        }
+
+
+        public async Task PullServerAsync(bool all)
+        {
+            var db = new SQLiteAsyncConnection(ContantsSqlite.DatabasePath, ContantsSqlite.Flags); ;
+            using var sync = new Synchronize(db);
+
+            // get server database
+            var time = all ? DateTime.MinValue : await sync.GetLastPulledAtAsync();
+            var result = await EndPoint.BaseURL
+                .AppendPathSegment("api/Sync/Pull")
+                .AppendQueryParam("Colletions", User.CollectionName)
+                .AppendQueryParam("Colletions", Note.CollectionName)
+                .AppendQueryParam("Timestamp", time.ToString("o"))
+                .GetAsync();
 
             var res = await result.ResponseMessage.Content.ReadAsStringAsync();
 
             //update local database from server
 
-            await _syncService.PushServerChangesToLocal(res);
+            await _syncRepository.PushServerChangesToLocal(res);
         }
-
     }
-
-
 ```
 
+
+5. (Optional) Implement upload docs in view model:<br/>
+
+```cs
+        [RelayCommand]
+        public async Task PushAsync()
+        {
+           var time =  await _apiService.PushServerAsync();
+            
+            await Toast.Make("Sync succefully").Show();
+
+            var docsErros = await _apiService.PushDocsToServerAsync(time);
+
+            if (docsErros.Any())
+            {
+                await Toast.Make("Some docs not sync").Show();
+            }
+            else
+            {
+                await Toast.Make("Docs upload in server").Show();
+            }
+        }
+```
 </details>
 
 

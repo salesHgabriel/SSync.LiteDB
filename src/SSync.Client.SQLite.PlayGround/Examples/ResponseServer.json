@@ -1,0 +1,24 @@
+[
+  {
+    "Collection": "User",
+    "Timestamp": "2025-02-11T22:34:26.8034451Z",
+    "Changes": {
+      "Created": [
+      ],
+      "Updated": [
+      ],
+      "Deleted": [
+        "23da0998-a71c-43f4-bbbe-bd6364b896b8"
+      ]
+    }
+  },
+  {
+    "Collection": "Estoque",
+    "Timestamp": "2025-02-11T22:34:26.8181139Z",
+    "Changes": {
+      "Created": [],
+      "Updated": [],
+      "Deleted": []
+    }
+  }
+]

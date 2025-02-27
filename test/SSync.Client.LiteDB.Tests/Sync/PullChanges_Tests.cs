@@ -70,7 +70,7 @@ namespace SSync.Client.LiteDB.Tests.Sync
 
             var sync = new Synchronize(database);
 
-            foreach (var us in users)
+            foreach (var us in users.ToList())
             {
                 sync.InsertSync(us, colUserName);
             }

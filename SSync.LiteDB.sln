@@ -21,13 +21,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSync.Server.LitebDB.Tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36F96630-08DF-4386-AADB-C8E121988D5B}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build_and_test.yaml = .github\workflows\build_and_test.yaml
 		.github\workflows\publish.yaml = .github\workflows\publish.yaml
 		readme.md = readme.md
-		.github\workflows\build_and_test.yaml = .github\workflows\build_and_test.yaml
 		readme.pt-br.md = readme.pt-br.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSync.Server.LitebDB.Integration.Tests", "test\SSync.Server.LitebDB.Integration.Tests\SSync.Server.LitebDB.Integration.Tests.csproj", "{1DF82900-C83A-4813-969C-EFB4E50E4476}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSync.Client.SQLite", "src\SSync.Client.SQLite\SSync.Client.SQLite.csproj", "{DEDFFFE0-6841-42B6-A8F0-A2097A350576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSync.Client.SQLite.Tests", "test\SSync.Client.SQLite.Tests\SSync.Client.SQLite.Tests.csproj", "{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSync.Client.SQLite.PlayGround", "src\SSync.Client.SQLite.PlayGround\SSync.Client.SQLite.PlayGround.csproj", "{47B93496-DC04-4520-A21A-52A7F3512C16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +69,18 @@ Global
 		{1DF82900-C83A-4813-969C-EFB4E50E4476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DF82900-C83A-4813-969C-EFB4E50E4476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DF82900-C83A-4813-969C-EFB4E50E4476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDFFFE0-6841-42B6-A8F0-A2097A350576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDFFFE0-6841-42B6-A8F0-A2097A350576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDFFFE0-6841-42B6-A8F0-A2097A350576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDFFFE0-6841-42B6-A8F0-A2097A350576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47B93496-DC04-4520-A21A-52A7F3512C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47B93496-DC04-4520-A21A-52A7F3512C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47B93496-DC04-4520-A21A-52A7F3512C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47B93496-DC04-4520-A21A-52A7F3512C16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +93,9 @@ Global
 		{47F5CD68-81DD-453D-A5A3-F42FDB844775} = {5F8FC591-4435-4387-838B-D8EC7768C42D}
 		{41717DBF-139C-4A74-8BA4-E9B2B289F529} = {5F8FC591-4435-4387-838B-D8EC7768C42D}
 		{1DF82900-C83A-4813-969C-EFB4E50E4476} = {5F8FC591-4435-4387-838B-D8EC7768C42D}
+		{DEDFFFE0-6841-42B6-A8F0-A2097A350576} = {EFFD198B-C248-4AE0-9085-2EDFAEA57294}
+		{95D6CC3F-9A0B-47FE-99AC-AE97A24A6A01} = {EFFD198B-C248-4AE0-9085-2EDFAEA57294}
+		{47B93496-DC04-4520-A21A-52A7F3512C16} = {EFFD198B-C248-4AE0-9085-2EDFAEA57294}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F1AE824B-4065-4342-A7CD-35122F2B99B4}

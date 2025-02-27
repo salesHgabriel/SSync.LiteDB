@@ -15,7 +15,7 @@ jobs:
           with:
             dotnet-version: 8.0.x
 
-# project ssync client
+# project ssync client litedb
 
         - uses: actions/checkout@v4
         - name: Set Version Client
@@ -37,7 +37,31 @@ jobs:
           run: |
             dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
-# end project ssync client
+# end project ssync client litedb
+
+# project ssync client sqlite
+
+        - uses: actions/checkout@v4
+        - name: Set Version Client
+          run: |
+            sed -i -e 's/1.1.1/${{github.ref_name}}/' ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj
+
+        - name: Restore Client
+          run: dotnet restore ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj
+
+        - name: Build Client
+          run: dotnet build --no-restore  ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj
+
+        - name: Pack Client
+          run: |
+            dotnet pack ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj -c Release -o output-client
+
+
+        - name: Publish Client to Nuget.Org    
+          run: |
+            dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+
+# end project ssync client sqlite
 
 # project ssync server
 

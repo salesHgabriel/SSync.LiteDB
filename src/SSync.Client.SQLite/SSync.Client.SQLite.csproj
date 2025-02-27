@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>SSync.Client.SQLite</Title>
+
+	  <PackageId>SSync.Client.SQLite</PackageId>
+	  <Version>1.1.1</Version>
+	  <Authors>Gabriel Sales</Authors>
+	  <Copyright>MIT</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageTags>database sqlite embedded sync api web api</PackageTags>
+	  <Title>SSync Client Sqlite</Title>
+	  <RepositoryUrl>https://github.com/salesHgabriel/SSync.LiteDB</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/salesHgabriel/SSync.LiteDB</PackageProjectUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <Description>Project to work sync client to server with sqlite</Description>
+	  <PackageIcon>sync-client-sqlite.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\sync-client-sqlite.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+  </ItemGroup>
+
+</Project>
