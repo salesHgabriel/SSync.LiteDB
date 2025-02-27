@@ -59,7 +59,7 @@ jobs:
 
         - name: Publish Client to Nuget.Org    
           run: |
-            dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push output-client/*.nupkg -k ${{ secrets.NUGET_API_KEY_CLIENT_SQLITE }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
 # end project ssync client sqlite
 
