@@ -118,6 +118,11 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
 
+- ## ✍🏻 Repos com os exemplos 
+[![Todos os exemplos com LiteDB](https://img.shields.io/badge/Todos_Exemplos_Com_LiteDB-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync)
+
+[![Todos os exemplos com SQLite](https://img.shields.io/badge/Todos_Exemplos_Com_SQLite-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync/tree/example-sqlite)
+
 Atualmente suporta:
 
 * Servidor: ASP.NET 8

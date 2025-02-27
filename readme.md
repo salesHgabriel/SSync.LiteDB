@@ -108,8 +108,6 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 [![How Make upload docs](https://img.shields.io/badge/How_Make_Upload_Docs-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/watch?v=Fr49m1ocRK0iDmlv)
 
 
-
-
 ## 🔄️ Flow
 ![alt text](doc/notes_ssync_en.png "Img Flow ssynclitedb en-us")
 
@@ -121,6 +119,11 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 ## To update server changes:
 
 ## ![alt text](doc/flow_update_server_changes.jpg "Img Update server changes")
+
+- ## ✍🏻 Repos with examples 
+[![All examples with LiteDB](https://img.shields.io/badge/All_Examples_With_LiteDB-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync)
+
+[![All examples with SQLite](https://img.shields.io/badge/All_Examples_With_SQLite-.NET-5C2D91.svg?style=for-the-badge&logo=.net&logoColor=white)](https://github.com/salesHgabriel/Samples-SSync/tree/example-sqlite)
 
 
 Currently supports:
