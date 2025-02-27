@@ -13,7 +13,7 @@ jobs:
           with:
             dotnet-version: 8.0.x
 
-# project ssync client
+# project ssync client litedb
 
         - uses: actions/checkout@v4
   
@@ -30,7 +30,26 @@ jobs:
           run: dotnet test ./test/SSync.Client.LiteDB.Tests/SSync.Client.LiteDB.Tests.csproj
 
 
-# end project ssync client
+# end project ssync client litedb
+
+# project ssync client sqlite
+
+        - uses: actions/checkout@v4
+  
+        - name: Restore Client
+          run: dotnet restore ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj
+
+        - name: Build Client
+          run: dotnet build --no-restore  ./src/SSync.Client.SQLite/SSync.Client.SQLite.csproj
+
+        - name: Clean
+          run: dotnet clean
+
+        - name: Run Unit Tests Client
+          run: dotnet test ./test/SSync.Client.SQLite.Tests/SSync.Client.SQLite.Tests.csproj
+
+
+# end project ssync client sqlite
 
 # project ssync server
 
