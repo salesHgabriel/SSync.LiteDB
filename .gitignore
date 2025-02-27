@@ -487,3 +487,5 @@ $RECYCLE.BIN/
 
 /src/SSync.Client.LiteDB.PlayGround/Examples/*
 /src/SSync.Server.LiteDB.PlayGround/Examples/*
+src/SSync.Client.SQLite.PlayGround/Examples/*
+
