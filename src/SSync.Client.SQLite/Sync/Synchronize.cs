@@ -50,6 +50,8 @@ namespace SSync.Client.SQLite.Sync
                 throw new PullChangesException("Collection not found");
             }
 
+            await _db.CreateTableAsync<T>();
+
             var createdQuery = doc.Where(d => d.Status == StatusSync.CREATED);
 
             var updatedQuery = doc.Where(d => d.Status == StatusSync.UPDATED);
@@ -261,7 +263,9 @@ namespace SSync.Client.SQLite.Sync
                 throw new PushChangeException("Collection not found");
             }
 
-           await _db.RunInTransactionAsync(async (sqlConnection) =>
+            await _db.CreateTableAsync<T>();
+
+            await _db.RunInTransactionAsync(async (sqlConnection) =>
               {
                   try
                   {
