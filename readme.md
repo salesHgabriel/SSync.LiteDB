@@ -128,8 +128,8 @@ SSYNC.LiteDB aims to simplify implementing data synchronization between the fron
 
 Currently supports:
 
-* Server: ASP.NET 8
-* Client: .NET 8
+* Server: ASP.NET 10
+* Client: .NET 10
 
 Client Platforms:
 
