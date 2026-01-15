@@ -10,15 +10,15 @@ namespace SSync.Server.LitebDB.Engine
 {
     public static class SSyncExtensions
     {
-        public static IServiceCollection AddSSyncSchemaCollection<TContext>(this IServiceCollection services,
+        public static void AddSSyncSchemaCollection<TContext>(this IServiceCollection services,
             Action<IPullExecutionOrderStep>? optionsPullChanges = null,
-            Action<IPushExecutionOrderStep>?optionsPushChanges = null) where TContext : DbContext, ISSyncDbContextTransaction
+            Action<IPushExecutionOrderStep>? optionsPushChanges = null) where TContext : DbContext, ISSyncDbContextTransaction
         {
             services
                 .Scan(scan => scan
                     .FromApplicationDependencies()
-                        .AddClasses(classe => classe.AssignableTo(typeof(ISSyncServices)))
-                            .AsImplementedInterfaces()
+                        .AddClasses(classe => classe.AssignableTo<ISSyncServices>())
+                            .As<ISSyncServices>()
                             .WithScopedLifetime()
                         .AddClasses(classe => classe.AssignableTo(typeof(IInternalISSyncPushRequest<>)))
                             .AsImplementedInterfaces()
@@ -61,8 +61,6 @@ namespace SSync.Server.LitebDB.Engine
             
 
             services.AddScoped<ISSyncDbContextTransaction>(provider => provider.GetRequiredService<TContext>());
-
-            return services;
         }
     }
 }

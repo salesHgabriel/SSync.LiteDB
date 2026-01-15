@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using SSync.Server.LitebDB.Abstractions;
+﻿using SSync.Server.LitebDB.Abstractions;
 using SSync.Server.LitebDB.Abstractions.Builders;
 using SSync.Server.LitebDB.Abstractions.Sync;
 using SSync.Server.LitebDB.Engine;
@@ -7,7 +6,6 @@ using SSync.Server.LitebDB.Enums;
 using SSync.Server.LitebDB.Exceptions;
 using SSync.Server.LitebDB.Extensions;
 using SSync.Server.LitebDB.Poco;
-using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -195,7 +193,7 @@ namespace SSync.Server.LitebDB.Sync
 
             var query = await handler.QueryAsync(paramenter);
 
-            if (DateTimeExtension.IsFirstPull(paramenter.Timestamp))
+            if (paramenter.Timestamp.IsFirstPull())
             {
                 var createds = query
                     .Where(entity => entity.DeletedAt == null)

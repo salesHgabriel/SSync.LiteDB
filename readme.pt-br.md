@@ -125,8 +125,8 @@ SSYNC.LiteDB tem como objetivo facilitar a implementação de sincronização de
 
 Atualmente suporta:
 
-* Servidor: ASP.NET 8
-* Cliente: .NET 8
+* Servidor: ASP.NET 10
+* Cliente: .NET 10
 
 Plataform clientes:
 
