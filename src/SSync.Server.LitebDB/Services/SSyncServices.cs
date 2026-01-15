@@ -5,7 +5,7 @@ using SSync.Server.LitebDB.Engine;
 
 namespace SSync.Server.LitebDB.Services
 {
-    internal class SSyncServices : ISSyncServices
+    public class SSyncServices : ISSyncServices
     {
         public SSyncServices(IServiceProvider serviceProvider)
         {
